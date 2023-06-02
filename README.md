@@ -1,7 +1,7 @@
 
 # MedSat
 
-The code for the MedSat. 
+The code for MedSat: A public health dataset featuring satellite imagery and medical prescriptions 
 
 🖼️ 📦 🎯 🔄
 
