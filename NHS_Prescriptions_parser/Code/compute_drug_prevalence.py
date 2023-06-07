@@ -7,9 +7,6 @@ import pandas as pd
 import sys
 from compute_Condition_Category_prevalence import calculateTemporalMetrics_LSOA, writeResultFiles
 
-# mappings_dir = '../mappings/'
-# input_dir = '../../../BL_Work/openPrescribe/serialized/'
-# output_dir = '../data_prep/'
 mappings_dir = '../mappings/'
 input_dir = '/10TBDrive_2/sagar/NHS_data/serialized/'
 output_dir = '../data_prep/'
