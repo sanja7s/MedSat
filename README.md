@@ -39,8 +39,8 @@ Access to the code is available at this respository, while the data can be found
 
 
 #### Example SHAP results
-![example SHAP features diabetes](figures/appendix_shap_values_diabetes.pdf)
-![example SHAP features total](figures/appendix_shap_values_total.pdf)
+![example SHAP features diabetes](figures/appendix_shap_values_diabetes.jpeg)
+![example SHAP features total](figures/appendix_shap_values_total.jpeg)
 
 
 > **NOTE**: **WAIT** Happy new project.
