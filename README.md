@@ -14,7 +14,7 @@ In this release, we provide data snapshots for the years 2019 (pre-COVID) and 20
 
 
 
-Access to the code is available at this respository, while the data can be found at \url{https://tinyurl.com/medsatpoint}. The dataset is released under the CC BY-SA 4.0 license.
+Access to the code is available at this respository, while the data can be found at https://tinyurl.com/medsatpoint. The dataset is released under the CC BY-SA 4.0 license.
 
 
 ### HOW TO USE THIS CODE
