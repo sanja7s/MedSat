@@ -1,6 +1,7 @@
-from sklearn.model_selection import train_test_split
 import numpy as np
 import pandas as pd
+from sklearn.model_selection import KFold
+from sklearn.model_selection import train_test_split
 
 variables_to_drop = ["e_lake_bottom_temperature", "e_surface_thermal_radiation_downwards_sum", "e_surface_pressure",
                      "e_soil_temperature_level_3", "e_soil_temperature_level_1", "e_temperature_2m",
@@ -58,14 +59,14 @@ e_variable_mapping = {
 e_variable_mapping = {'e_'+k:v for (k,v) in e_variable_mapping.items()}
 
 soc_variable_mapping = {
-    "c_percent asian": "asian ethnicity",
-    "c_percent black": "black ethnicity",
-    "c_percent mixed": "mixed ethnicity",
-    "c_percent white": "white ethnicity",
-    "c_percent christian" : "christian religion",
-    "c_percent jewish": "jewish religion",
+    "c_percent asian": "Asian ethnicity",
+    "c_percent black": "Black ethnicity",
+    "c_percent mixed": "Mixed ethnicity",
+    "c_percent white": "White ethnicity",
+    "c_percent christian" : "Christian religion",
+    "c_percent jewish": "Jewish religion",
     "c_percent no religion": "no religion",
-    "c_percent muslim": "muslim religion",
+    "c_percent muslim": "Muslim religion",
     "c_percent no central heating": "no central heating",
     "c_percent wood heating": "wood heating",
     "c_percent communal heating": "communal heating",
@@ -117,7 +118,19 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-modalities = ["socioeconomic", "environmental", "landcover"]
+modalities = ["socioeconomic", "environmental"]
+
+def get_dataset_fold_splits(dataset):
+    #we shuffle the rors to remove spatial autocorrelation
+    kf = KFold(n_splits=5, shuffle=True, random_state=0)
+    fold_splits = []
+    for train_index, test_index in kf.split(dataset):
+        train_fold, test_fold = dataset.iloc[train_index], dataset.iloc[test_index]
+        test_fold, val_fold = train_test_split(test_fold, test_size=0.25, random_state=0)
+        print(len(train_fold), len(val_fold), len(test_fold))
+        fold_splits.append((train_fold, val_fold, test_fold))
+
+    return fold_splits
 
 def split_dataset(dataset, ratio_test=0.2):
     dataset_train, other_dataset = train_test_split(
@@ -136,8 +149,12 @@ def split_dataset(dataset, ratio_test=0.2):
 
     return dataset_train, dataset_val, dataset_test
 
-def extract_features_and_labels(dataset, outcome_col, modalities):
+
+def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=False):
     labels = np.array(dataset[outcome_col])
+    if log_normalize and outcome_col in ["o_opioids_quantity_per_capita", "o_total_quantity_per_capita"]:
+        labels = np.log(labels)
+
     #exclude the outcome columns
     features = dataset.filter(regex="^(?!o_)")
 
@@ -145,10 +162,9 @@ def extract_features_and_labels(dataset, outcome_col, modalities):
     for modality in modalities:
         if modality == "socioeconomic":
             features_per_modality = features.filter(regex='^(c_)')
-        elif modality == "environmental":
-            features_per_modality = features.filter(regex='^(e_)').drop(columns=land_cover_columns)
         else:
-            features_per_modality = features.filter(items=land_cover_columns)
+            features_per_modality = features.filter(regex='^(e_)')
+
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
@@ -157,42 +173,8 @@ def extract_features_and_labels(dataset, outcome_col, modalities):
     return modalities_features, labels
 
 
-def set_size(width_pt, fraction=1, subplots=(1, 1)):
-    """
-    Source: https://jwalton.info/Matplotlib-latex-PGF/
-    Set figure dimensions to sit nicely in our document.
-
-    Parameters
-    ----------
-    width_pt: float
-            Document width in points
-    fraction: float, optional
-            Fraction of the width which you wish the figure to occupy
-    subplots: array-like, optional
-            The number of rows and columns of subplots.
-    Returns
-    -------
-    fig_dim: tuple
-            Dimensions of figure in inches
-    """
-    # Width of figure (in pts)
-    fig_width_pt = width_pt * fraction
-    # Convert from pt to inches
-    inches_per_pt = 1 / 72.27
-
-    # Golden ratio to set aesthetic figure height
-    golden_ratio = (5**.5 - 1) / 2
-
-    # Figure width in inches
-    fig_width_in = fig_width_pt * inches_per_pt
-    # Figure height in inches
-    fig_height_in = fig_width_in * golden_ratio * (subplots[0] / subplots[1])
-
-    return (fig_width_in, fig_height_in)
-
-
 if __name__ == '__main__':
-    dataset = pd.read_csv('data/raw_master.csv', index_col=['geography code'])
+    dataset = pd.read_csv('./data/raw_master.csv', index_col=['geography code'])
     split_dataset(dataset)
 
 
