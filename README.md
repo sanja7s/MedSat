@@ -27,9 +27,13 @@ Access to the code is available at this respository, while the data can be found
 
 
 
+### PEAKS INTO THE DATASET
+
+##### Example __MEDSAT__  point features
 ![example __MEDSAT__  point features](figures/maps_data_diagram.jpg)
 
 
+##### Example __MEDSAT__  image features
 ![example __MEDSAT__  image features](figures/composite_data_vis.jpg)
 
 
