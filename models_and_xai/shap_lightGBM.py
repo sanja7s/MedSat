@@ -90,7 +90,7 @@ def visualize_shap_values(shap_explainer, condition):
         width = 3.3
     fig = plt.figure()
     shap.summary_plot(shap_explainer, show=False, max_display=10, color_bar=False, cmap="plasma")
-    plt.gcf().set_size_inches(width, 4)
+    plt.gcf().set_size_inches(width, 3.2)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     if condition != "diabetes":
@@ -108,7 +108,7 @@ def visualize_shap_values(shap_explainer, condition):
 
 
     plt.xlabel("SHAP", fontsize=10)
-    plt.title("{} prescriptions".format(condition.capitalize()), fontsize=10)
+    plt.title("{} prescriptions".format(condition), fontsize=10)
     fig.tight_layout()
     plt.savefig(os.path.join(xai_results_base_dir, "shap_values_{}.pdf".format(condition)), dpi=300)
     plt.close()
@@ -126,10 +126,9 @@ def compute_feature_rank(condition, feature_name="population density"):
 
 if __name__ == '__main__':
 
-    #set the style for the plots
-    #plt.rcParams.update(tex_fonts)
-
-    xai_results_base_dir = "./data/results/xai"
+    xai_results_base_dir = "./results/xai/lightGBM"
+    if not os.path.exists(xai_results_base_dir):
+        os.makedirs(xai_results_base_dir)
 
     train_data = pd.read_csv('data/train_raw.csv', index_col=['geography code'])
     val_data = pd.read_csv('data/val_raw.csv', index_col=['geography code'])
