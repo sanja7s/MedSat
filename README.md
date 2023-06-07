@@ -2,10 +2,14 @@
 # __MEDSAT__
 
 The code for __MEDSAT__: A public health dataset for England featuring satellite imagery and medical prescriptions.
- 
+
 
 🖼️ 📦 🎯 🔄
 
+
+The __MEDSAT__ dataset serves as a comprehensive resource for public and population health studies in England, encompassing medical prescription quantity per capita as outcomes and a wide array of sociodemographic and environmental variables as features (Figure ![Alt Text](figures/data_diagram_hist.jpg)
+). In this release, we provide data snapshots for the years 2019 (pre-COVID) and 2020 (COVID). 
+Sociodemographic variables align with the latest UK census from 2021. Figure ![Alt Text](figures/maps_data_diagram.jpg) visualises example __MEDSAT__  variables. Access to the code is available at this respository, while the data can be found at \url{https://tinyurl.com/medsatpoint}. The dataset is released under the CC BY-SA 4.0 license.
 
 
 ### HOW TO USE THIS CODE
