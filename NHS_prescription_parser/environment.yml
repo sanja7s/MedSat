@@ -1,0 +1,10 @@
+name: nhsrefactor
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.8
+  - jupyter
+  - pandas
+  - networkx==2.8.4
+prefix: /opt/anaconda3/envs/nhsrefactor
