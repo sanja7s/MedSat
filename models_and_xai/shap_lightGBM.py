@@ -17,22 +17,6 @@ import util
 from util import variables_to_drop, variable_mapping
 import matplotlib.pyplot as plt
 
-tex_fonts = {
-    #source: https://jwalton.info/Embed-Publication-Matplotlib-Latex/
-    # Use LaTeX to write all text
-    "text.usetex": True,
-    "font.family": "serif",
-    # Use 10pt font in plots, to match 10pt font in document
-    "axes.labelsize": 6,
-    "font.size": 10,
-    # Make the legend/label fonts a little smaller
-    "legend.fontsize": 8,
-    "axes.titlesize": 8,
-    #"xtick.labelsize": 8,
-    #"ytick.labelsize": 8,
-    'text.latex.preamble': r"\usepackage{amsmath}"
-}
-
 from util import extract_features_and_labels, split_dataset
 from lightGBM import train_LGB
 
