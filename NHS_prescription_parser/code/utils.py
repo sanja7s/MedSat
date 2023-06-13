@@ -10,10 +10,6 @@ import glob
 import numpy as np
 import networkx as nx 
 
-
-
-
-
 def cleanStringofUTF(string):
     my_str_as_bytes = str.encode(string,'utf-8')
     cleaned = str(my_str_as_bytes).replace('\xe8','e').replace('\xf6','o')
