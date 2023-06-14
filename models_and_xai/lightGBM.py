@@ -33,16 +33,14 @@ def train_LGB(x_train, y_train, x_val, y_val):
     return model
 
 
+def train_evaluate_light_gbm(fold_splits, modality_comb=modalities):
 
-
-
-def evaluate_lightgbm_per_modality_comb(fold_splits, modality_comb):
-
-    results = []
-    for med_condition in all_conditions:
+    results = {}
+    for condition in all_conditions:
         test_r2_scores = []
         test_rmse_scores = []
-        med_condition = "o_{}_quantity_per_capita".format(med_condition)
+        med_condition = "o_{}_quantity_per_capita".format(condition)
+        results[condition] = {}
         for fold in fold_splits:
             # Split data into training and validation sets for this fold
             train_fold = fold[0]
@@ -64,25 +62,18 @@ def evaluate_lightgbm_per_modality_comb(fold_splits, modality_comb):
             test_r2_scores.append(r2_test)
             test_rmse_scores.append(mse_test)
 
-        r2_per_cond = np.mean(np.array(test_r2_scores))
-        mse_per_cond = np.mean(np.array(test_rmse_scores))
-        results.append((med_condition, r2_per_cond, mse_per_cond))
+        results[condition]["r2"] = test_r2_scores
+        results[condition]["mse"] = test_rmse_scores
 
-    results = pd.DataFrame(results, columns=["Condition", "R2", "MSE"])
-
-    light_gbm_results_dir = "./results/models/lightGBM/kfold/"
-    if not os.path.exists(light_gbm_results_dir):
-        os.makedirs(light_gbm_results_dir)
-    results.to_csv("{}/{}.csv".format(light_gbm_results_dir,"_".join(modality_comb)), index=False)
+    return results
 
 
+#TODO: make the code work for diffent modalities as input after the last changes.
+# for L in range(len(modalities) + 1):
+#     for modality_comb in itertools.combinations(modalities, L):
+#                     if len(modality_comb) > 0:
+#                     evaluate_lightgbm_per_modality_comb(fold_splits, modality_comb)
 
-if __name__ == '__main__':
-    dataset = pd.read_csv('./data/raw_master.csv', index_col=['geography code'])
-    fold_splits = get_dataset_fold_splits(dataset)
-    for L in range(len(modalities) + 1):
-        for modality_comb in itertools.combinations(modalities, L):
-            if len(modality_comb) > 0:
-                evaluate_lightgbm_per_modality_comb(fold_splits, modality_comb)
+
 
 

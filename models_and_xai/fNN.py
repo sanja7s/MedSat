@@ -114,9 +114,6 @@ def test(test_loader, model):
             y_true.extend(labels.cpu().numpy())
             y_pred.extend(outputs.cpu().numpy())
 
-    # calculate MSE and R^2 scores
-    # print(np.mean(np.array(y_true)))
-    # print(np.var(np.array(y_pred)))
     mse = mean_squared_error(y_true, y_pred)
     r2 = r2_score(y_true, y_pred)
     print("MSE: {:.5f}, R^2 Score: {:.5f}".format(mse, r2))
@@ -134,11 +131,12 @@ def get_data_loader(x, y):
 
 def fnn_train_evaluation(fold_splits, num_epochs=100, num_hidden_layers=3, embedding_dim=512):
 
-    results = []
+    results = {}
     for condition in all_conditions:
         test_r2_scores = []
         test_mse_scores = []
         med_condition = "o_{}_quantity_per_capita".format(condition)
+        results[condition] = {}
         for fold in fold_splits:
             # Split data into training and validation sets for this fold
             train_fold = fold[0]
@@ -164,16 +162,10 @@ def fnn_train_evaluation(fold_splits, num_epochs=100, num_hidden_layers=3, embed
             test_r2_scores.append(r2)
             test_mse_scores.append(mse)
 
-        r2_per_cond = np.mean(np.array(test_r2_scores))
-        mse_per_cond = np.mean(np.array(test_mse_scores))
+        results[condition]["r2"] = test_r2_scores
+        results[condition]["mse"] = test_mse_scores
 
-        results.append((condition, r2_per_cond, mse_per_cond))
-
-    results = pd.DataFrame(results, columns=["Condition", "R2", "MSE"])
-    fnn_results_dir = "./results/models/fnn/kfold/"
-    if not os.path.exists(fnn_results_dir):
-        os.makedirs(fnn_results_dir)
-    results.to_csv("{}/{}.csv".format(fnn_results_dir, "_".join(modalities)), index=False)
+    return results
 
 
 if __name__ == '__main__':

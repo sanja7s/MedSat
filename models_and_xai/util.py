@@ -37,7 +37,7 @@ e_variable_mapping = {
     "surface_thermal_radiation_downwards_sum": "thermal radiation",
     "evaporation_from_bare_soil_sum": "total bare soil evaporation",
     "evaporation_from_the_top_of_canopy_sum": "total canopy evaporation",
-    "evaporation_from_open_water_surfaces_excluding_oceans_sum": "evaporation from open water surfaces excluding oceans sum",
+    "evaporation_from_open_water_surfaces_excluding_oceans_sum": "evaporation open water surfaces",
     "total_evaporation_sum": "total evaporation sum",
     "u_component_of_wind_10m": "east-west wind",
     "v_component_of_wind_10m": "north-south wind",
@@ -118,25 +118,15 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-modalities = ["socioeconomic", "environmental"]
+modalities = ["sociodemograhic", "environmental"]
 
-def get_dataset_fold_splits(dataset):
-    #we shuffle the rors to remove spatial autocorrelation
-    kf = KFold(n_splits=5, shuffle=True, random_state=0)
-    fold_splits = []
-    for train_index, test_index in kf.split(dataset):
-        train_fold, test_fold = dataset.iloc[train_index], dataset.iloc[test_index]
-        test_fold, val_fold = train_test_split(test_fold, test_size=0.25, random_state=0)
-        print(len(train_fold), len(val_fold), len(test_fold))
-        fold_splits.append((train_fold, val_fold, test_fold))
 
-    return fold_splits
 
-def split_dataset(dataset, ratio_test=0.2):
+def split_dataset(dataset, ratio_test=0.3):
     dataset_train, other_dataset = train_test_split(
         dataset, test_size=ratio_test, random_state=0)
     dataset_test, dataset_val = train_test_split(
-        other_dataset, test_size=0.25, random_state=0)
+        other_dataset, test_size=0.5, random_state=0)
 
     dataset_train.to_csv('data/train_raw.csv')
     dataset_val.to_csv('data/val_raw.csv')
@@ -160,7 +150,7 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
 
     modality_dfs = []
     for modality in modalities:
-        if modality == "socioeconomic":
+        if modality == "sociodemograhic":
             features_per_modality = features.filter(regex='^(c_)')
         else:
             features_per_modality = features.filter(regex='^(e_)')
