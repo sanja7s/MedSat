@@ -51,26 +51,57 @@ def get_missing_values_per_year(year):
     columns_with_missing_values = missing_values_per_column[missing_values_per_column > 0]
     columns_with_missing_values.to_csv("./data/{}_missing_values.csv".format(year))
 
+
+def plot_distribution(year, columns_of_interest, var_name="age group"):
+    descriptive_analysis_dir = "./data/descriptive/"
+    if not os.path.exists(descriptive_analysis_dir):
+        os.makedirs(descriptive_analysis_dir)
+
+    dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
+    features, labels = extract_features_and_labels(dataset, "o_diabetes_quantity_per_capita", modalities)
+    features = features[columns_of_interest]
+    features = pd.melt(features, var_name=var_name, value_name="percent")
+    fig, ax = plt.subplots(figsize=(3, 4))
+    sns.barplot(data=features, x=var_name, y="percent",
+                errorbar="sd", palette="dark", alpha=.6, ax=ax, order=columns_of_interest)
+    ax.set_title("{} distribution".format(var_name))
+    ax.set_xticklabels(ax.xaxis.get_ticklabels(), rotation=45, ha="right")
+
+    fig.tight_layout()
+    plt.savefig(os.path.join(descriptive_analysis_dir, "{}.pdf".format(var_name)), dpi=300)
+    plt.close()
+
 def plot_light_gbm_fnn_results(year):
-    light_gbm_results_file = "./results/models/lightGBM/repeated_kfold/{}_raw_master.csv".format(year)
-    light_gbm_results = pd.read_csv(light_gbm_results_file)
-    light_gbm_results_long = pd.melt(light_gbm_results, id_vars='Condition', value_vars=['R2'])
+    light_gbm_results_file = "./results/models/lightGBM/repeated_kfold/{}.csv".format(year)
+    light_gbm_results = pd.read_csv(light_gbm_results_file, index_col=0)
+    light_gbm_results_long = pd.melt(light_gbm_results, var_name="condition", value_name="R2")
+    light_gbm_results_long["model"] = "LightGBM"
 
-    light_gbm_results["model"]="lightGBM"
+    fnn_results_file = "./results/models/fnn/repeated_kfold/{}.csv".format(year)
+    fnn_results = pd.read_csv(fnn_results_file, index_col=0)
+    fnn_results_long = pd.melt(fnn_results, var_name="condition", value_name="R2")
+    fnn_results_long["model"] = "fNN"
 
-    fnn_results_file = "./results/models/fnn/repeated_kfold/{}_raw_master.csv".format(year)
-    fnn_results = pd.read_csv(fnn_results_file)
-    fnn_results["model"]="fNN"
+    summary_results = pd.concat([light_gbm_results_long, fnn_results_long], ignore_index=True, sort=False)
 
-    summary_results = pd.concat([light_gbm_results, fnn_results], ignore_index=True, sort=False)
+    model_comparison_dir = "./results/model_comparison/"
+    if not os.path.exists(model_comparison_dir):
+        os.makedirs(model_comparison_dir)
 
     fig, ax = plt.subplots(figsize=(4, 4))
 
-    sns.catplot(data=summary_results, kind="bar",x="condition", y="R2", hue="model",
-                errorbar="sd", palette="dark", alpha=.6, ax=ax)
+    conditions_order = ["diabetes", "hypertension", "depression", "anxiety", "opioids", "asthma", "total"]
+    sns.barplot(data=summary_results, x="condition", y="R2", hue="model",
+                errorbar="sd", palette="dark", alpha=.6, ax=ax, order=conditions_order)
+    ax.set_title("prescription prediction for {}".format(year))
+    ax.set_xticklabels(ax.xaxis.get_ticklabels(), rotation=45, ha="right")
+    ax.set_ylabel(r'$R^2$ score')
 
+    fig.tight_layout()
+    plt.savefig(os.path.join(model_comparison_dir, "model_comparison_{}.pdf".format(year)), dpi=300)
+    plt.close()
 
 
 
 if __name__ == '__main__':
-    plot_correlation_among_features(2020, "environmental", env_features_to_show)
+    plot_distribution(2019, gender_columns, "gender")

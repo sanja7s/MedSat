@@ -45,5 +45,5 @@ def perform_repeated_cross_val(year, model_fn, model_dir):
     summarized_results.to_csv("{}/{}.csv".format(model_results_dir, year))
 
 if __name__ == '__main__':
-    #perform_repeated_cross_val(2020, train_evaluate_light_gbm, "lightGBM")
-    perform_repeated_cross_val(2020, fnn_train_evaluation, "fnn")
+    perform_repeated_cross_val(2019, train_evaluate_light_gbm, "lightGBM")
+    #perform_repeated_cross_val(2019, fnn_train_evaluation, "fnn")

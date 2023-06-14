@@ -16,8 +16,8 @@ e_variable_mapping = {
     "total_aerosol_optical_depth_at_550nm_surface": "aerosols",
     "particulate_matter_d_less_than_25_um_surface": "PM2.5",
     "ndvi": "greenery",
-    "leaf_area_index_high_vegetation": "high vegetation leaf area index",
-    "leaf_area_index_low_vegetation": "low vegetation leaf area index",
+    "leaf_area_index_high_vegetation": "high vegetation LAI",
+    "leaf_area_index_low_vegetation": "low vegetation LAI",
     "temperature_2m": "temperature",
     "soil_temperature_level_1": "surface soil temperature",
     "soil_temperature_level_3": "deep soil temperature",
@@ -35,8 +35,8 @@ e_variable_mapping = {
     "surface_net_solar_radiation_sum": "total solar energy absorption",
     "surface_solar_radiation_downwards_sum": "solar radiation",
     "surface_thermal_radiation_downwards_sum": "thermal radiation",
-    "evaporation_from_bare_soil_sum": "total bare soil evaporation",
-    "evaporation_from_the_top_of_canopy_sum": "total canopy evaporation",
+    "evaporation_from_bare_soil_sum": "bare soil evaporation",
+    "evaporation_from_the_top_of_canopy_sum": "canopy evaporation",
     "evaporation_from_open_water_surfaces_excluding_oceans_sum": "evaporation open water surfaces",
     "total_evaporation_sum": "total evaporation sum",
     "u_component_of_wind_10m": "east-west wind",
@@ -70,9 +70,9 @@ soc_variable_mapping = {
     "c_percent no central heating": "no central heating",
     "c_percent wood heating": "wood heating",
     "c_percent communal heating": "communal heating",
-    "c_percent TFW less than 2km": "travel to work less than 2km",
-    "c_percent TFW 2km to 5km": "travel to work between 2km and 5km",
-    "c_percent TFW 60km and over": "travel to work more than 60km",
+    "c_percent TFW less than 2km": "work travel less than 2km",
+    "c_percent TFW 2km to 5km": "work travel 2km and 5km",
+    "c_percent TFW 60km and over": "work travel more than 60km",
     "c_percent WFH": "work from home",
     "c_percent part-time": "part-time work",
     "c_percent 15 hours or less worked": "worked less than 15h",
@@ -107,8 +107,32 @@ soc_variable_mapping = {
     "c_percent poor-english": "poor-english",
     "c_percent highly-deprived": "highly-deprived",
     "c_percent mid-deprived": "mid-deprived",
-    "c_percent male": "percent male",
+    "c_percent male": "male",
     "c_total population": "total population",
+    "c_percent 8. Process plant and machine operatives": "machine operatives",
+    "c_percent 5. Skilled trades occupations": "skilled trades occupations",
+    "c_percent commute car": "commute by car",
+    "c_net annual income": "net annual income",
+    "c_percent   can speak english very well": "speaks english very well",
+    "c_percent Aged 4 years and under": "4 years and under",
+    "c_percent Aged 5 to 9 years": "5 to 9 years",
+    "c_percent Aged 10 to 14 years": "10 to 14 years",
+    "c_percent Aged 15 to 19 years": "15 to 19 years",
+    "c_percent Aged 20 to 24 years": "20 to 24 years",
+    "c_percent Aged 25 to 29 years": "25 to 29 years",
+    "c_percent Aged 30 to 34 years": "30 to 34 years",
+    "c_percent Aged 35 to 39 years": "35 to 39 years",
+    "c_percent Aged 40 to 44 years": "40 to 44 years",
+    "c_percent Aged 45 to 49 years": "45 to 49 years",
+    "c_percent Aged 50 to 54 years": "50 to 54 years",
+    "c_percent Aged 55 to 59 years": "55 to 59 years",
+    "c_percent Aged 60 to 64 years": "60 to 64 years",
+    "c_percent Aged 65 to 69 years": "65 to 69 years",
+    "c_percent Aged 70 to 74 years": "70 to 74 years",
+    "c_percent Aged 75 to 79 years": "75 to 79 years",
+    "c_percent Aged 80 to 84 years": "80 to 84 years",
+    "c_percent Aged 85 years and over": "85 years and over"
+
 }
 
 variable_mapping = {**e_variable_mapping, **soc_variable_mapping}
@@ -120,17 +144,22 @@ all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety'
 
 modalities = ["sociodemograhic", "environmental"]
 
+age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 years",
+               "20 to 24 years", "25 to 29 years", "30 to 34 years", "35 to 39 years",
+               "40 to 44 years", "45 to 49 years", "50 to 54 years", "55 to 59 years",
+               "60 to 64 years", "65 to 69 years", "70 to 74 years", "75 to 79 years",
+               "80 to 84 years", "85 years and over"]
 
+gender_columns = ["male"]
 
-def split_dataset(dataset, ratio_test=0.3):
-    dataset_train, other_dataset = train_test_split(
-        dataset, test_size=ratio_test, random_state=0)
-    dataset_test, dataset_val = train_test_split(
-        other_dataset, test_size=0.5, random_state=0)
+def split_dataset(year, ratio_test=0.3):
+    dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
+    dataset_train, other_dataset = train_test_split(dataset, test_size=ratio_test, random_state=0)
+    dataset_test, dataset_val = train_test_split(other_dataset, test_size=0.5, random_state=0)
 
-    dataset_train.to_csv('data/train_raw.csv')
-    dataset_val.to_csv('data/val_raw.csv')
-    dataset_test.to_csv('data/test_raw.csv')
+    dataset_train.to_csv('data/{}_train_raw.csv'.format(year))
+    dataset_val.to_csv('data/{}_val_raw.csv'.format(year))
+    dataset_test.to_csv('data/{}_test_raw.csv'.format(year))
 
     print("Dataset size: {}".format(len(dataset)))
     print("Train size: {}".format(len(dataset_train)))
@@ -164,8 +193,7 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
 
 
 if __name__ == '__main__':
-    dataset = pd.read_csv('./data/raw_master.csv', index_col=['geography code'])
-    split_dataset(dataset)
+    split_dataset(2019)
 
 
 
