@@ -68,12 +68,3 @@ def train_evaluate_light_gbm(fold_splits, modality_comb=modalities):
     return results
 
 
-#TODO: make the code work for diffent modalities as input after the last changes.
-# for L in range(len(modalities) + 1):
-#     for modality_comb in itertools.combinations(modalities, L):
-#                     if len(modality_comb) > 0:
-#                     evaluate_lightgbm_per_modality_comb(fold_splits, modality_comb)
-
-
-
-

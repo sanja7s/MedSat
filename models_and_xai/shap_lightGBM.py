@@ -16,6 +16,7 @@ from sklearn.preprocessing import StandardScaler
 import util
 from util import variables_to_drop, variable_mapping
 import matplotlib.pyplot as plt
+import matplotlib.cm as cm
 
 from util import extract_features_and_labels, split_dataset
 from lightGBM import train_LGB
@@ -69,27 +70,25 @@ def plot_individual_LSOAs(lsoa_id, dataset, shap_values, condition):
 
 #latex article class has witdh of 397.484pt
 def visualize_shap_values(shap_explainer, condition):
-    width = 3.7
-    if condition == "diabetes":
-        width = 3.3
+    width = 4
+    # if condition == "diabetes":
+    #     width = 3.3
     fig = plt.figure()
-    shap.summary_plot(shap_explainer, show=False, max_display=10, color_bar=False, cmap="plasma")
-    plt.gcf().set_size_inches(width, 3.2)
+    shap.summary_plot(shap_explainer, show=False, max_display=15, color_bar=False, cmap="plasma")
+    plt.gcf().set_size_inches(width, 3.7)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
-    if condition != "diabetes":
-        import matplotlib.cm as cm
-        #color = shap.plots.colors.blue_rgb
-        #cmap = shap.plots._utils.convert_color(color)
-        m = cm.ScalarMappable(cmap="plasma")
-        m.set_array([0, 1])
-        cb = plt.colorbar(m, ticks=[0, 1], aspect=50)
-        cb.set_ticklabels(["Low", "High"])
-        cb.set_label("Feature value", size=10, labelpad=-2)
-        cb.ax.tick_params(labelsize=8, length=0)
-        cb.set_alpha(1)
-        cb.outline.set_visible(False)
-
+    # if condition != "diabetes":
+    #color = shap.plots.colors.blue_rgb
+    #cmap = shap.plots._utils.convert_color(color)
+    m = cm.ScalarMappable(cmap="plasma")
+    m.set_array([0, 1])
+    cb = plt.colorbar(m, ticks=[0, 1], aspect=50)
+    cb.set_ticklabels(["Low", "High"])
+    cb.set_label("Feature value", size=10, labelpad=-2)
+    cb.ax.tick_params(labelsize=8, length=0)
+    cb.set_alpha(1)
+    cb.outline.set_visible(False)
 
     plt.xlabel("SHAP", fontsize=10)
     plt.title("{} prescriptions".format(condition), fontsize=10)
@@ -110,13 +109,14 @@ def compute_feature_rank(condition, feature_name="population density"):
 
 if __name__ == '__main__':
 
-    xai_results_base_dir = "./results/xai/lightGBM"
+    target_year = 2020
+    xai_results_base_dir = "./results/xai/lightGBM/{}".format(target_year)
     if not os.path.exists(xai_results_base_dir):
         os.makedirs(xai_results_base_dir)
 
-    train_data = pd.read_csv('data/train_raw.csv', index_col=['geography code'])
-    val_data = pd.read_csv('data/val_raw.csv', index_col=['geography code'])
-    test_data = pd.read_csv('data/test_raw.csv', index_col=['geography code'])
+    train_data = pd.read_csv('data/{}_train_raw.csv'.format(target_year), index_col=['geography code'])
+    val_data = pd.read_csv('data/{}_val_raw.csv'.format(target_year), index_col=['geography code'])
+    test_data = pd.read_csv('data/{}_test_raw.csv'.format(target_year), index_col=['geography code'])
 
     shap_values_per_condition=[]
     test_features_per_condition = []
