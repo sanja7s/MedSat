@@ -71,13 +71,13 @@ def plot_distribution(year, columns_of_interest, var_name="age group"):
     plt.savefig(os.path.join(descriptive_analysis_dir, "{}.pdf".format(var_name)), dpi=300)
     plt.close()
 
-def plot_light_gbm_fnn_results(year):
-    light_gbm_results_file = "./results/models/lightGBM/repeated_kfold/{}.csv".format(year)
+def plot_light_gbm_fnn_results(year, modalities=all_modalities):
+    light_gbm_results_file = "./results/models/lightGBM/repeated_kfold/{}_{}.csv".format(year, "_".join(modalities))
     light_gbm_results = pd.read_csv(light_gbm_results_file, index_col=0)
     light_gbm_results_long = pd.melt(light_gbm_results, var_name="condition", value_name="R2")
     light_gbm_results_long["model"] = "LightGBM"
 
-    fnn_results_file = "./results/models/fnn/repeated_kfold/{}.csv".format(year)
+    fnn_results_file = "./results/models/fnn/repeated_kfold/{}_{}.csv".format(year, "_".join(modalities))
     fnn_results = pd.read_csv(fnn_results_file, index_col=0)
     fnn_results_long = pd.melt(fnn_results, var_name="condition", value_name="R2")
     fnn_results_long["model"] = "fNN"
@@ -98,7 +98,8 @@ def plot_light_gbm_fnn_results(year):
     ax.set_ylabel(r'$R^2$ score')
 
     fig.tight_layout()
-    plt.savefig(os.path.join(model_comparison_dir, "model_comparison_{}.pdf".format(year)), dpi=300)
+    plt.savefig(os.path.join(model_comparison_dir, "model_comparison_{}_{}.pdf".format(year, "_".join(modalities))),
+                             dpi=300)
     plt.close()
 
 

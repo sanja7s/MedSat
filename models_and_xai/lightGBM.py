@@ -33,7 +33,7 @@ def train_LGB(x_train, y_train, x_val, y_val):
     return model
 
 
-def train_evaluate_light_gbm(fold_splits, modality_comb=modalities):
+def train_evaluate_light_gbm(fold_splits, modalities=all_modalities):
 
     results = {}
     for condition in all_conditions:
@@ -48,11 +48,11 @@ def train_evaluate_light_gbm(fold_splits, modality_comb=modalities):
             test_fold = fold[2]
 
             scaler = StandardScaler()
-            x_train, y_train = extract_features_and_labels(train_fold, med_condition, modality_comb)
+            x_train, y_train = extract_features_and_labels(train_fold, med_condition, modalities)
             x_train = scaler.fit_transform(x_train)
-            x_val, y_val = extract_features_and_labels(val_fold, med_condition, modality_comb)
+            x_val, y_val = extract_features_and_labels(val_fold, med_condition, modalities)
             x_val = scaler.transform(x_val)
-            x_test, y_test = extract_features_and_labels(test_fold, med_condition, modality_comb)
+            x_test, y_test = extract_features_and_labels(test_fold, med_condition, modalities)
             x_test = scaler.transform(x_test)
 
             lgb_model = train_LGB(x_train, y_train, x_val, y_val)

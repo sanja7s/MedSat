@@ -125,9 +125,9 @@ if __name__ == '__main__':
     for i, condition in enumerate(util.all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
-        x_train, y_train = extract_features_and_labels(train_data, med_condition, util.modalities)
-        x_val, y_val = extract_features_and_labels(val_data, med_condition, util.modalities)
-        x_test, y_test = extract_features_and_labels(test_data, med_condition, util.modalities)
+        x_train, y_train = extract_features_and_labels(train_data, med_condition, util.all_modalities)
+        x_val, y_val = extract_features_and_labels(val_data, med_condition, util.all_modalities)
+        x_test, y_test = extract_features_and_labels(test_data, med_condition, util.all_modalities)
 
         #normalize data
         scaler = StandardScaler()

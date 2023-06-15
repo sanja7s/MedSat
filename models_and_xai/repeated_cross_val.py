@@ -16,13 +16,13 @@ def get_dataset_fold_splits(dataset, test_size=0.5):
 
     return fold_splits
 
-def perform_repeated_cross_val(year, model_fn, model_dir):
+def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalities):
     dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code']).dropna()
     cross_validation_times = 5
     folds_test_scores = None
     for i in range(cross_validation_times):
         fold_splits = get_dataset_fold_splits(dataset)
-        cross_val_result = model_fn(fold_splits)
+        cross_val_result = model_fn(fold_splits, modalities)
         if folds_test_scores is None:
             folds_test_scores = cross_val_result
         else:
@@ -42,8 +42,8 @@ def perform_repeated_cross_val(year, model_fn, model_dir):
     if not os.path.exists(model_results_dir):
         os.makedirs(model_results_dir)
 
-    summarized_results.to_csv("{}/{}.csv".format(model_results_dir, year))
+    summarized_results.to_csv("{}/{}_{}.csv".format(model_results_dir, year, "_".join(modalities)))
 
 if __name__ == '__main__':
-    perform_repeated_cross_val(2019, train_evaluate_light_gbm, "lightGBM")
+    perform_repeated_cross_val(2019, fnn_train_evaluation, "lightGBM")
     #perform_repeated_cross_val(2019, fnn_train_evaluation, "fnn")

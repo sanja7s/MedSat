@@ -142,7 +142,7 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-modalities = ["sociodemograhic", "environmental"]
+all_modalities = ["sociodemograhic", "environmental"]
 
 age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 years",
                "20 to 24 years", "25 to 29 years", "30 to 34 years", "35 to 39 years",
