@@ -22,21 +22,7 @@ def str2bool(v):
         raise argparse.ArgumentTypeError('Boolean value expected.')
 
 
-def func_ome(df,drugBNF,ome_map,quantity_field):
-    df['presc_ome'] = df[quantity_field] *df['15']*ome_map[drugBNF]
-    return df
 
-def calculateOME(pdp,ome_map,code_field, quantity_field):
-    pdp['presc_ome'] = 0.0
-    print(code_field  , quantity_field)
-    return pdp.groupby(code_field ,as_index=False).apply(lambda df: func_ome(df , df.name, ome_map ,quantity_field))
-
-def makeOMEmap():
-    ome = pd.read_csv('../mappings/ome_rossano.csv')
-    ome_map = {}
-    for index,  row in ome.iterrows():
-        ome_map[row['bnf']] = row['ome_multiplier']
-    return ome_map
 
 def DrugMatching(conditions, isCat=False):
     drug_association_graph = nx.read_gexf(mappings_dir + 'drug_association_graph.gexf')
@@ -85,71 +71,7 @@ def prepare_lsoa_GP_population():
     return LSOA_patient_pop
 
 
-def calculateTemporalMetrics_LSOA_opioids(all_presc , old = True):
-    LSOA_costs = {}
-    LSOA_items = {}
-    LSOA_quantity = {}
-    LSOA_ome = {}
 
-
-    LSOA_patient_count = {}
-    fail = 0.0
-    LSOA_map = {}
-    [LSOA_dist_old , LSOA_dist_2021] = loadLSOA_mappings()
-
-    #At this time we are using the same map for all files. Ideally, every year needs to have a different map.
-    if old:
-        quantityField = '8'
-        costField = '7'
-        omeField = 'presc_ome'
-        itemField = '5'
-        practiceField = '2'
-        LSOA_map = LSOA_dist_2021
-    else:
-        quantityField = 'TOTAL_QUANTITY'
-        costField = 'ACTUAL_COST'
-        omeField = 'presc_ome'
-        itemField = 'ITEMS'
-        practiceField = 'PRACTICE_CODE'
-        LSOA_map = LSOA_dist_2021
-
-    for name, group in all_presc.groupby(practiceField):
-        total_ome = np.sum(group[omeField])
-        total_cost = np.sum(group[costField])
-        total_quantity = np.sum(group[quantityField])
-        total_items = np.sum(group[itemField])
-        if name in LSOA_map:        
-            for k in LSOA_map[name]:
-                if k not in LSOA_ome:
-                    LSOA_ome[k] = 0.0
-                    LSOA_costs[k] = 0.0
-                    LSOA_quantity[k] = 0.0
-                    LSOA_items[k] = 0.0
-                LSOA_ome[k]+= float(total_ome)*float(LSOA_map[name][k])
-                LSOA_costs[k]+= float(total_cost)*float(LSOA_map[name][k])
-                LSOA_quantity[k]+= float(total_quantity)*float(LSOA_map[name][k])
-                LSOA_items[k]+= float(total_items)*float(LSOA_map[name][k])
-    
-    return  LSOA_quantity  , LSOA_costs,  LSOA_ome , LSOA_items
-
-
-def writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new ,diseases,output_dir):
-    LSOA_patient_pop = prepare_lsoa_GP_population()
-    for disease in tqdm(diseases):
-        disease_dict = {'YYYYMM':[] , 'LSOA_CODE' : [] , 'Total_quantity' : [] ,'OME' :[] , 'Total_cost' : [] ,'Total_items': [] , 'Patient_count' : []}
-        for yyyymm in monthly_borough_dosage_new:
-            for LSOA_CODE in monthly_borough_dosage_new[yyyymm][disease]:
-                if LSOA_CODE[0] == 'E':
-                    disease_dict['YYYYMM'].append(yyyymm)
-                    disease_dict['LSOA_CODE'].append(LSOA_CODE)
-                    disease_dict['Total_quantity'].append(monthly_borough_quantity_new[yyyymm][disease][LSOA_CODE])
-                    disease_dict['OME'].append(monthly_borough_dosage_new[yyyymm][disease][LSOA_CODE])
-                    disease_dict['Total_cost'].append(monthly_borough_costs_new[yyyymm][disease][LSOA_CODE])
-                    disease_dict['Total_items'].append(monthly_borough_items_new[yyyymm][disease][LSOA_CODE])
-                    disease_dict['Patient_count'].append(LSOA_patient_pop[LSOA_CODE])
-        disease_df = pd.DataFrame.from_dict(disease_dict)
-        filename = output_dir + disease+'_V4.csv.gz'
-        disease_df.to_csv(filename,index=False,compression='gzip')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
