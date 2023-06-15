@@ -1,13 +1,11 @@
 import networkx as nx
 import pandas as pd
 from tqdm import tqdm
-from code.utils.utils import findDrugsForDisease , findDrugsForCategory
+from utils.utils import findDrugsForDisease , findDrugsForCategory
 
 class diseaseMatcher:
-    def __init__(self, input_dir, output_dir , mappings_dir="../mappings/"):
+    def __init__(self , mappings_dir="../mappings/"):
         self.mappings_dir = mappings_dir
-        self.input_dir = input_dir
-        self.output_dir = output_dir
 
     def drug_matching(self, conditions, is_cat=False):
         drug_association_graph = nx.read_gexf(self.mappings_dir + 'drug_association_graph.gexf')
