@@ -1,10 +1,11 @@
 name: nhsrefactor
 channels:
-  - defaults
   - conda-forge
+  - anaconda
 dependencies:
+  - pandas
   - python=3.8
   - jupyter
-  - pandas
   - networkx==2.8.4
-prefix: /opt/anaconda3/envs/nhsrefactor
+  - tqdm
+prefix: /opt/miniconda3/envs/nhsrefactor
