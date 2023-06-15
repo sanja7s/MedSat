@@ -1,12 +1,2 @@
 BNF_code,Drug_name,Mapped_Condition
-0601023V0,Metformin Hydrochloride/Rosiglitazone,metformin
-0601023AJ,Alogliptin/Metformin,metformin
-0601023AF,Linagliptin/Metformin,metformin
-0601023W0,Metformin Hydrochloride/Pioglitazone,metformin
-0601023Z0,Metformin Hydrochloride/Vildagliptin,metformin
-0601023AP,Canagliflozin/Metformin,metformin
-0601023AL,Dapagliflozin/Metformin,metformin
-0601023AR,Empagliflozin/Metformin,metformin
-0601022B0,Metformin Hydrochloride,metformin
-0601023AD,Metformin Hydrochloride/Sitagliptin,metformin
-0601023AH,Saxagliptin/Metformin,metformin
+1202010W0,Fluticasone Furoate,Fluticasone
