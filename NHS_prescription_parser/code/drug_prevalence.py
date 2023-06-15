@@ -92,7 +92,7 @@ if __name__ == '__main__':
     print("Done computing LSOA level prescription prevalences, writing files")
 
 
-    writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new , drug_list ,output_dir , mappings_dir='./mappings/')
+    writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new , list(drugMap.keys()) ,output_dir , mappings_dir='./mappings/')
     drugMatcher.dumpDrugs(DiseaseDrugs)
 
     print("Finished processing !!!!! ")
