@@ -129,7 +129,7 @@ def get_data_loader(x, y):
     return DataLoader(dataset, batch_size=64, shuffle=True)
 
 
-def fnn_train_evaluation(fold_splits, num_epochs=100, num_hidden_layers=3, embedding_dim=512):
+def fnn_train_evaluation(fold_splits, modalities=all_modalities, num_epochs=100, num_hidden_layers=3, embedding_dim=512):
 
     results = {}
     for condition in all_conditions:
@@ -166,9 +166,3 @@ def fnn_train_evaluation(fold_splits, num_epochs=100, num_hidden_layers=3, embed
         results[condition]["mse"] = test_mse_scores
 
     return results
-
-
-if __name__ == '__main__':
-    dataset = pd.read_csv('./data/raw_master.csv', index_col=['geography code'])
-    fold_splits = get_dataset_fold_splits(dataset)
-    fnn_train_evaluation(fold_splits)
