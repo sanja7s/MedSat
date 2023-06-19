@@ -1,0 +1,17 @@
+{
+  "sertraline": ["0403030Q0"],
+  "fluoxetine": ["0403030E0"],
+  "paroxetine": ["0403030P0"],
+  "citalopram": ["0403030D0"],
+  "venlafaxine": ["0403030Y0"],
+  "duloxetine": ["0403040X0"],
+  "pregabalin": ["0408010AE"],
+  "buspirone": ["0403010B0"],
+  "clomipramine": ["0403010H0"],
+  "diazepam": ["0401020K0", "0408020D0"],
+  "escitalopram": ["0403030X0"],
+  "hydroxyzine": ["0304010I0"],
+  "lorazepam": ["0401020L0"],
+  "promethazine": ["0304010Y0"],
+  "propranolol": ["0204000R0"]
+}
