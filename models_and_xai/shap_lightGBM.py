@@ -14,7 +14,7 @@ import pickle
 from sklearn.preprocessing import StandardScaler
 
 import util
-from util import variables_to_drop, variable_mapping
+from util import variable_mapping
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
