@@ -3,12 +3,6 @@ import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
 
-variables_to_drop = ["e_lake_bottom_temperature", "e_surface_thermal_radiation_downwards_sum", "e_surface_pressure",
-                     "e_soil_temperature_level_3", "e_soil_temperature_level_1", "e_temperature_2m",
-                     "e_dewpoint_temperature_2m", "e_lake_mix_layer_temperature", "e_snow_density",
-                     "e_total_evaporation_sum", "e_surface_latent_heat_flux_sum", "e_surface_solar_radiation_downwards_sum",
-                     "e_surface_net_solar_radiation_sum", "e_evaporation_from_bare_soil_sum", "e_lake_total_layer_temperature",
-                     "e_leaf_area_index_low_vegetation", "e_evaporation_from_the_top_of_canopy_sum", "e_volumetric_soil_water_layer_1"]
 
 e_variable_mapping = {
     "NO2": "NO2",
