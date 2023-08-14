@@ -1,2 +1,3 @@
-/models_and_xai/data/
-/models_and_xai/results/
+data/
+results/
+processing/
