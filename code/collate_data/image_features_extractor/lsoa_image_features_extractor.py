@@ -44,6 +44,7 @@ def extract_lsoa_pixel_statistics(out_image, nodata_value):
 
 
 def aggregate_pixel_statistics(image_features):
+    image_features = image_features.drop(columns=["SEN-2_ID"])
     image_features_mean = image_features.groupby("geography code").agg("mean").filter(regex="^(mean_)|(std_)")
     image_features_max = image_features.groupby("geography code").agg("max").filter(regex="^(max_)")
     image_features_min = image_features.groupby("geography code").agg("min").filter(regex="^(min_)")
@@ -51,17 +52,6 @@ def aggregate_pixel_statistics(image_features):
 
     return pd.concat([image_features_mean, image_features_min, image_features_max, image_features_median],
                      axis=1)
-
-
-def merge_image_features_and_point_features(image_features_filepath, year):
-    image_features = pd.read_csv(image_features_filepath, index_col=0)
-
-    point_features_filepath = "./data/{}_spatial_raw_master.csv".format(year)
-    point_features = pd.read_csv(point_features_filepath, index_col=['geography code'])
-
-    merged_data = pd.merge(point_features, image_features, left_index=True, right_index=True)
-
-    merged_data.to_csv("spatial_raw_master")
 
 
 def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
@@ -81,8 +71,8 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
                 try:
                     out_image, out_transform = rasterio.mask.mask(sen2_composite, [geom], crop=True)
                     lsoa_pixels_statistics, col_names = extract_lsoa_pixel_statistics(out_image, sen2_composite.nodata)
-                    lsoa_summary_date = [lsoa_id, image_file] + lsoa_pixels_statistics
-                    associations.append(lsoa_summary_date)
+                    lsoa_pixels_agg = [lsoa_id, image_file] + lsoa_pixels_statistics
+                    associations.append(lsoa_pixels_agg)
                     #save_lsoa_as_tiff(image_dir, sen2_composite, lsoa_id, out_image, out_transform)
                     match_found = True
                 except:
@@ -93,20 +83,21 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
 
     print("Number of matched LSOAs: {}".format(len(associations)))
     col_names = ["geography code", "SEN-2_ID"] + col_names
-    image_features = pd.DataFrame(associations, columns=col_names)
-    image_features = aggregate_pixel_statistics(image_features)
+    lsoa_image_data = pd.DataFrame(associations, columns=col_names)
+    image_features = aggregate_pixel_statistics(lsoa_image_data)
 
-    output_file_root_dir = "../../data/point_data/image_features/"
+    sen_2_season = os.path.split(image_dir)[1]
+    output_file_root_dir = os.path.join("../../../data/point_data/image_features/", sen_2_season)
     if not os.path.exists(output_file_root_dir):
         os.makedirs(output_file_root_dir)
 
-    sen_2_season = os.path.split(image_dir)[1]
-    image_features.to_csv(os.path.join(output_file_root_dir, "{}.csv".format(sen_2_season)))
+    image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixels_statistics.csv"))
+    lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_mapping.csv"))
 
 if __name__ == '__main__':
 
-    lsoa_shapefile_root_dir = "../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
+    lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
 
-    image_dir = "../../data/image_data/England_JJA2020"
+    image_dir = "../../../data/image_data/England_JJA2020"
 
     extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir)
