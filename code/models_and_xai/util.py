@@ -190,6 +190,18 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
     return modalities_features, labels
 
 
+def merge_image_features_and_point_features(image_features_filepath, year):
+    image_features = pd.read_csv(image_features_filepath, index_col=0)
+
+    point_features_filepath = "./data/{}_spatial_raw_master.csv".format(year)
+    point_features = pd.read_csv(point_features_filepath, index_col=['geography code'])
+
+    merged_data = pd.merge(point_features, image_features, left_index=True, right_index=True)
+
+    merged_data.to_csv("spatial_raw_master")
+
+
+
 if __name__ == '__main__':
     split_dataset(2019)
 
