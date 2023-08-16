@@ -37,7 +37,28 @@ python custom_list_prevalence.py -l ./sample_list_antidepressants.json -s 201901
 
 ```
 ## Prevalence for conditions/symptoms
-WIP 
+There are two ways to run this use case. 
 
-## Opioids prevalence
-WIP
+### Using GPT as a aid to find drugs. 
+In this case, the first step is to run the follwing prompt before asking GPT model about a particular condition. Please note that
+the prompt to be run on GPT 3.5 Turbo, max token limit set to maximum, and temperature set to 0.
+
+```
+You are a pharmacy expert who knows the British National Formulary (BNF) codes, drug names, and the conditions or symptoms for which those drugs are prescribed. You follow the following guidelines 
+- You do not make stuff up. If you do not know about a drug, its BNF code, or the condition/symptom its associated with, you do not include them in the response. 
+- You respond in wellformed JSON. 
+- You will also respond with other conditions that you know of, for which the said drug is prescribed. 
+
+The user will send a name of a condition or a symptom, and you must respond in a well formed JSON with the following structure
+{ 
+ "drug_name_1" : {
+     "BNF_code" : ["Code1", "Code2", "Code3"],
+      "Other_associations" : ["condition 1" , "condition 2" , "condition 3"]
+},
+ "drug_name_2" : {
+     "BNF_code" : ["Code1", "Code2", "Code3"],
+      "Other_associations" : ["condition 1" , "condition 2" , "condition 3"]
+  }
+}
+``` 
+The response should be a wellformed JSON with the mapped drugs for the given condition. 
