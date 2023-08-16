@@ -136,7 +136,7 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-all_modalities = ["sociodemograhic", "environmental", "geo"]
+all_modalities = ["sociodemograhic", "environmental", "geo", "image"]
 
 age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 years",
                "20 to 24 years", "25 to 29 years", "30 to 34 years", "35 to 39 years",
@@ -181,25 +181,14 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
             features_per_modality = features.filter(regex='^(e_)')
         elif modality == "geo":
             features_per_modality = features.filter(regex='^(centroid_)')
-
+        else:
+            features_per_modality = features.filter(regex='^(image_)')
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
     modalities_features.rename(columns=variable_mapping, inplace=True)
 
     return modalities_features, labels
-
-
-def merge_image_features_and_point_features(image_features_filepath, year):
-    image_features = pd.read_csv(image_features_filepath, index_col=0)
-
-    point_features_filepath = "./data/{}_spatial_raw_master.csv".format(year)
-    point_features = pd.read_csv(point_features_filepath, index_col=['geography code'])
-
-    merged_data = pd.merge(point_features, image_features, left_index=True, right_index=True)
-
-    merged_data.to_csv("spatial_raw_master")
-
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@ def train_LGB(x_train, y_train, x_val, y_val):
 
     # Create LightGBM datasets
     train_data = lgb.Dataset(x_train, label=y_train)
+
     val_data = lgb.Dataset(x_val, label=y_val)
 
     # Train model with early stopping
