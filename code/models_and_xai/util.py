@@ -181,7 +181,7 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
             features_per_modality = features.filter(regex='^(e_)')
         elif modality == "geo":
             features_per_modality = features.filter(regex='^(centroid_)')
-        else:
+        elif modality == "image":
             features_per_modality = features.filter(regex='^(image_)')
         modality_dfs.append(features_per_modality)
 
