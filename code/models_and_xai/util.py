@@ -183,6 +183,8 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
             features_per_modality = features.filter(regex='^(centroid_)')
         elif modality == "image":
             features_per_modality = features.filter(regex='^(image_)')
+        elif modality == "spatial":
+            features_per_modality = features.filter(regex='^(geometry)')
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
