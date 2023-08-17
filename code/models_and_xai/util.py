@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import KFold
 from sklearn.model_selection import train_test_split
+import os
+import geopandas as gpd
 
 
 e_variable_mapping = {
@@ -155,6 +157,11 @@ regex_per_modality = {
     "image":  '^(image_)'
 }
 
+data_folder = "../../data/point_data/"
+image_features_folder = os.path.join(data_folder, "image_features")
+results_folder = "../../results/models/"
+processing_folder = "../../processing/models/spatial_cv_folds/"
+
 def split_dataset(year, ratio_test=0.3):
     dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
     dataset_train, other_dataset = train_test_split(dataset, test_size=ratio_test, random_state=0)
@@ -200,6 +207,21 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
 
     return modalities_features, labels
 
+def merge_with_image_features(dataset):
+    if os.path.exists(image_features_folder):
+        for season in os.listdir(image_features_folder):
+            image_features_season = os.path.join(image_features_folder, season)
+            image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
+            image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
+            dataset = dataset.merge(image_features, left_index=True, right_index=True)
+    return dataset
+
+def read_spatial_dataset(year):
+    sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
+    sdataset.set_index('geography code', inplace=True)
+    sdataset = merge_with_image_features(sdataset)
+
+    return sdataset
 
 if __name__ == '__main__':
     split_dataset(2019)
