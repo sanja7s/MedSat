@@ -91,13 +91,13 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
     if not os.path.exists(output_file_root_dir):
         os.makedirs(output_file_root_dir)
 
-    image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixels_statistics.csv"))
+    image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixel_statistics.csv"))
     lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_mapping.csv"))
 
 if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
 
-    image_dir = "../../../data/image_data/England_JJA2020"
+    image_dir = "../../../data/image_data/England_DFJ20192020"
 
     extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir)

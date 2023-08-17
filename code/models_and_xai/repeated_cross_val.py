@@ -1,6 +1,5 @@
 import os
 import pandas
-import geopandas as gpd
 import pandas as pd
 
 from util import *
@@ -9,12 +8,6 @@ from fNN import fnn_train_evaluation
 # import spacv
 import itertools
 
-
-
-data_folder = "../../data/point_data/"
-image_features_folder = os.path.join(data_folder, "image_features", "England_JJA2020")
-results_folder = "../../results/models/"
-processing_folder = "../../processing/models/spatial_cv_folds/"
 
 def get_dataset_fold_splits(dataset, test_size=0.5):
     kf = KFold(n_splits=5, shuffle=True)
@@ -27,12 +20,13 @@ def get_dataset_fold_splits(dataset, test_size=0.5):
 
     return fold_splits
 
+
 def get_dataset_spatial_fold_splits(sdataset, year, fold_iterration, val_size=0.5):
     cv = pd.read_csv(processing_folder + "{}_{}_folds_with_geography_code.csv".format(fold_iterration+1, year))
 
     fold_splits = []
     for i in range(5):
-        cv_fold = cv[cv["Fold"]==i+1]
+        cv_fold = cv[cv["Fold"] == i+1]
         train_index = list(cv_fold[cv_fold["Type"]=="Train"]["GeographyCode"])
         test_index = list(cv_fold[cv_fold["Type"]=="Test"]["GeographyCode"])
 
@@ -68,12 +62,7 @@ def get_dataset_spatial_fold_splits(sdataset, year, fold_iterration, val_size=0.
 
 #     return spatial_splits
 
-def merge_with_image_features(dataset):
-    if os.path.exists(image_features_folder):
-        image_features = pd.read_csv(os.path.join(image_features_folder, "lsoas_pixel_statistics.csv"), index_col="geography code")
-        image_features.columns = ["image_{}".format(col) for col in image_features.columns]
-        dataset = dataset.merge(image_features, left_index=True, right_index=True)
-    return dataset
+
 
 def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalities):
     dataset = pd.read_csv(data_folder+'{}_spatial_raw_master.csv'.format(year), index_col='geography code').dropna()
@@ -111,12 +100,9 @@ def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalit
 # SPATIAL EVALUATION
 def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, modalities=all_modalities):
     """
-    we need spatial dataset here, so we read geojson
-    this way, we can split the LSOAs based on their centroid distances
+    the geojson is read, so that we can split the LSOAs based on their centroid distances
     """
-    sdataset = gpd.read_file(data_folder+'{}_spatial_raw_master.geojson'.format(year)).dropna()
-    sdataset.set_index('geography code', inplace=True)
-    sdataset = merge_with_image_features(sdataset)
+    sdataset = read_spatial_dataset(year)
 
     cross_validation_times = 5
     buffer_radius=None
@@ -161,32 +147,23 @@ def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, mo
     summarized_results_std.to_csv("{}/{}_{}_{}_std.csv".format(model_results_dir, year, buffer_radius, "_".join(modalities)))
 
 
-if __name__ == '__main__':
-
+def perform_spatial_cross_val_for_year(year, model_fn, model_dir):
     #single modality
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "sociodemographic"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "sociodemographic"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "environmental"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "environmental"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["sociodemographic"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["sociodemographic"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["image"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental"])
+    #two modalities
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "environmental"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "image"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image"])
+    #three modalities
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image", "sociodemographic"])
 
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image", "sociodemographic"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image", "sociodemographic"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image", "environmental"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "image", "environmental"])
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "sociodemographic", "environmental"])
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["geo", "sociodemographic", "environmental"])
-    #
-    # #all modalities
-    perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM")
-    perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM")
 
-    # perform_repeated_spatial_cross_val(2019, train_evaluate_light_gbm, "lightGBM")
-    # perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM")
-    # perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", SLOO=True)
+if __name__ == '__main__':
+    #perform_spatial_cross_val_for_year(2020, train_evaluate_light_gbm, "lightGBM")
+    #perform_spatial_cross_val_for_year(2019, train_evaluate_light_gbm, "lightGBM")
+
+    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
+    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
 

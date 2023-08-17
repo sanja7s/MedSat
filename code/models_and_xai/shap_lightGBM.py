@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
+import os
 import os.path
 
 import pandas as pd
@@ -13,12 +14,11 @@ import shap
 import pickle
 from sklearn.preprocessing import StandardScaler
 
-import util
-from util import variable_mapping
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-from util import extract_features_and_labels, split_dataset
+from util import *
+from repeated_cross_val import get_dataset_spatial_fold_splits
 from lightGBM import train_LGB
 
 
@@ -93,7 +93,7 @@ def visualize_shap_values(shap_explainer, condition):
     plt.xlabel("SHAP", fontsize=10)
     plt.title("{} prescriptions".format(condition), fontsize=10)
     fig.tight_layout()
-    plt.savefig(os.path.join(xai_results_base_dir, "shap_values_{}.pdf".format(condition)), dpi=300)
+    plt.savefig(os.path.join(shap_results_base_dir, "shap_values_{}.pdf".format(condition)), dpi=300)
     plt.close()
 
 
@@ -107,27 +107,33 @@ def compute_feature_rank(condition, feature_name="population density"):
 
     print(condition, feature_name, feature_rank_index)
 
+
 if __name__ == '__main__':
 
     target_year = 2020
-    xai_results_base_dir = "./results/xai/lightGBM/{}".format(target_year)
-    if not os.path.exists(xai_results_base_dir):
-        os.makedirs(xai_results_base_dir)
+    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP",str(target_year))
+    if not os.path.exists(shap_results_base_dir):
+        os.makedirs(shap_results_base_dir)
 
-    train_data = pd.read_csv('data/{}_train_raw.csv'.format(target_year), index_col=['geography code'])
-    val_data = pd.read_csv('data/{}_val_raw.csv'.format(target_year), index_col=['geography code'])
-    test_data = pd.read_csv('data/{}_test_raw.csv'.format(target_year), index_col=['geography code'])
+    fold_splits = get_dataset_spatial_fold_splits(read_spatial_dataset(target_year), target_year, 1)
+    fold_split = fold_splits[0]
+
+    train_data = fold_split[0]
+    val_data = fold_split[1]
+    test_data = fold_split[2]
 
     shap_values_per_condition=[]
     test_features_per_condition = []
     test_labels_per_condition = []
-
-    for i, condition in enumerate(util.all_conditions):
+    target_modalities = ["sociodemographic", "environmental", "image"]
+    for i, condition in enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
-        x_train, y_train = extract_features_and_labels(train_data, med_condition, util.all_modalities)
-        x_val, y_val = extract_features_and_labels(val_data, med_condition, util.all_modalities)
-        x_test, y_test = extract_features_and_labels(test_data, med_condition, util.all_modalities)
+        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities)
+        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities)
+        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities)
+
+        print(x_train.shape)
 
         #normalize data
         scaler = StandardScaler()
@@ -153,13 +159,13 @@ if __name__ == '__main__':
         shap_values_val_df = pd.DataFrame(shap_values_val.values, columns=x_val.columns, index=x_val.index)
         shap_values_test_df = pd.DataFrame(shap_values_test.values, columns=x_test.columns, index=x_test.index)
 
-        shap_values_train_df.to_csv(os.path.join(xai_results_base_dir, "shap_values_train_{}.csv".format(condition)))
-        shap_values_val_df.to_csv(os.path.join(xai_results_base_dir, "shap_values_val_{}.csv".format(condition)))
-        shap_values_test_df.to_csv(os.path.join(xai_results_base_dir, "shap_values_test_{}.csv".format(condition)))
+        shap_values_train_df.to_csv(os.path.join(shap_results_base_dir, "shap_values_train_{}.csv".format(condition)))
+        shap_values_val_df.to_csv(os.path.join(shap_results_base_dir, "shap_values_val_{}.csv".format(condition)))
+        shap_values_test_df.to_csv(os.path.join(shap_results_base_dir, "shap_values_test_{}.csv".format(condition)))
 
-        if condition == "total":
-            plot_individual_LSOAs("E01023500", val_data, shap_values_val, condition)
-            plot_individual_LSOAs("E01014782", train_data, shap_values_train, condition)
+        # if condition == "total":
+        #     plot_individual_LSOAs("E01023500", val_data, shap_values_val, condition)
+        #     plot_individual_LSOAs("E01014782", train_data, shap_values_train, condition)
 
         visualize_shap_values(shap_values_test, condition)
         compute_feature_rank(condition)
