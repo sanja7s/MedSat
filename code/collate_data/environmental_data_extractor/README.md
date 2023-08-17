@@ -15,11 +15,11 @@ Note: this is the only module in __MEDSAT__ that requires a registration for an 
 
 > **STEPS**
 (Please refer to `SETTING_UP_GEE.pptx` for screenshots explaining the steps below.) 
-1. GEE Registration: 
+1. GEE Registration:\
 	i) Visit [Sign Up Page](https://signup.earthengine.google.com/)\
 	ii) Sign-up with your Google account\
 	iii) You should obtain the email approval soon\
-2. Create a GEE Project:
+2. Create a GEE Project:\
 	i) Visit [Your GEE Project Page](https://code.earthengine.google.com)\
 	ii) Select 'Assets' tab\
 	iii) Click 'ADD PROJECT' > 'Create a new Cloud Project'. If you set the name to 'ee-env-data-extractor' it will be easier as you will not need to change that in code\
@@ -30,7 +30,7 @@ Note: this is the only module in __MEDSAT__ that requires a registration for an 
 	iii) For Regions, upload the content of `Regions_(December_2022)_EN_BFC` directory, except for the file that ends with `.xml`\
 	iv) For LSOAS, upload the content of `LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)` directory, except for the file that ends with `.xml`\
 	v) Wait a couple of minutes until these large files are uploaded and then setting up GEE is done!\
-5. You can START using the Colab Notebooks in your GDrive.
+5. You can START using the Colab Notebooks in your GDrive.\
 	i) Just open the notebooks and run them as any Jupyter Notebook.\
 	ii) There are only two changes you might need to make in this code:\
 		- PROJECT_NAME = 'ee-env-data-extractor' ## TODO: CHANGE TO YOUR PROJECT NAME (if you created a GEE project with a different name)\
