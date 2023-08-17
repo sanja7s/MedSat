@@ -16,13 +16,13 @@ Note: this is the only module in __MEDSAT__ that requires a registration for an 
 > **STEPS**
 (Please refer to `SETTING_UP_GEE.pptx` for screenshots explaining the steps below.) 
 1. GEE Registration:\
-	i) Visit [Sign Up Page](https://signup.earthengine.google.com/)\
+	i) Visit the [Sign Up Page](https://signup.earthengine.google.com/)\
 	ii) Sign-up with your Google account\
-	iii) You should obtain the email approval soon\
+	iii) You should obtain the email approval soon
 2. Create a GEE Project:\
 	i) Visit [Your GEE Project Page](https://code.earthengine.google.com)\
 	ii) Select 'Assets' tab\
-	iii) Click 'ADD PROJECT' > 'Create a new Cloud Project'. If you set the name to 'ee-env-data-extractor' it will be easier as you will not need to change that in code\
+	iii) Click 'ADD PROJECT' > 'Create a new Cloud Project'. If you set the name to 'ee-env-data-extractor', it will be easier as you will not need to change that in code later
 3. Place the code (`code/collate_data/environmental_data_extractor`) into your Google Drive\
 4. Upload LSOA/Region shapefiles to your [GEE Assets](https://code.earthengine.google.com)\
 	i) Select the project you created at step 2\
