@@ -136,7 +136,7 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-all_modalities = ["sociodemograhic", "environmental", "geo", "image"]
+all_modalities = ["sociodemographic", "environmental", "geo", "image"]
 
 age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 years",
                "20 to 24 years", "25 to 29 years", "30 to 34 years", "35 to 39 years",
@@ -147,6 +147,13 @@ age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 
 gender_columns = ["male"]
 
 geo_columns = ["centroid_x","centroid_y"]
+
+regex_per_modality = {
+    "sociodemographic": '^(c_)',
+    "environmental": '^(e_)',
+    "geo": '^(centroid_)',
+    "image":  '^(image_)'
+}
 
 def split_dataset(year, ratio_test=0.3):
     dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
@@ -185,6 +192,7 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
             features_per_modality = features.filter(regex='^(image_)')
         elif modality == "spatial":
             features_per_modality = features.filter(regex='^(geometry)')
+        features_per_modality = features.filter(regex=regex_per_modality[modality])
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
