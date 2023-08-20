@@ -62,7 +62,7 @@ def main():
         parsed_data = parse_spatial_regression(data)
 
         df_output = pd.DataFrame(parsed_data)
-        df_output = df_output.sort_values(by=['Probability'])
+        df_output = df_output.sort_values(by=['Probability', 'Coefficient'])
 
         # print (df_output)
         output_file_name = file.replace(".txt", "_variable_importance.csv")
