@@ -138,7 +138,7 @@ land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland"
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
-all_modalities = ["sociodemographic", "environmental", "geo", "image"]
+all_modalities = ["sociodemographic", "environmental", "geo", "image", "spatial"]
 
 age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 years",
                "20 to 24 years", "25 to 29 years", "30 to 34 years", "35 to 39 years",
@@ -154,13 +154,16 @@ regex_per_modality = {
     "sociodemographic": '^(c_)',
     "environmental": '^(e_)',
     "geo": '^(centroid_)',
-    "image":  '^(image_)'
+    "image":  '^(image_)',
+    "spatial": '^(geometry)'
 }
 
-data_folder = "../../data/point_data/"
+data_folder = "../../data/point_data/collated_data/"
 image_features_folder = os.path.join(data_folder, "image_features")
 results_folder = "../../results/models/"
 processing_folder = "../../processing/models/spatial_cv_folds/"
+descriptive_analysis_dir = "../../data/descriptive/"
+auxiliary_data_folder = "../../data/auxiliary_data/"
 
 def split_dataset(year, ratio_test=0.3):
     dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
@@ -189,16 +192,6 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
 
     modality_dfs = []
     for modality in modalities:
-        if modality == "sociodemograhic":
-            features_per_modality = features.filter(regex='^(c_)')
-        elif modality == "environmental":
-            features_per_modality = features.filter(regex='^(e_)')
-        elif modality == "geo":
-            features_per_modality = features.filter(regex='^(centroid_)')
-        elif modality == "image":
-            features_per_modality = features.filter(regex='^(image_)')
-        elif modality == "spatial":
-            features_per_modality = features.filter(regex='^(geometry)')
         features_per_modality = features.filter(regex=regex_per_modality[modality])
         modality_dfs.append(features_per_modality)
 
@@ -213,7 +206,8 @@ def merge_with_image_features(dataset):
             image_features_season = os.path.join(image_features_folder, season)
             image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
             image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-            dataset = dataset.merge(image_features, left_index=True, right_index=True)
+            # dataset = dataset.merge(image_features, left_index=True, right_index=True)
+            dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
 def read_spatial_dataset(year):
@@ -222,6 +216,15 @@ def read_spatial_dataset(year):
     sdataset = merge_with_image_features(sdataset)
 
     return sdataset
+
+
+def standardize_data(dataset):
+    features_ztransform = [c for c in dataset.columns if not c in ['geography code', 'geography', 'LSOA21NM', 'geometry', 'centroid_x', 'centroid_y']]
+    for k in features_ztransform:
+        dataset[k] = (dataset[k] -\
+                dataset[k].mean())/dataset[k].std(ddof=0)
+        
+    return dataset
 
 if __name__ == '__main__':
     split_dataset(2019)

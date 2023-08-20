@@ -18,26 +18,25 @@ def parse_single_year(the_year, modalities):
 
     mod = "_".join(modalities)
 
-    dataset = gpd.read_file(data_folder + f"{the_year}_spatial_raw_master.geojson").dropna()
-
-    if (os.path.exists(image_features_folder)):
-        features_image = pd.read_csv(os.path.join(image_features_folder, "lsoas_pixel_statistics.csv"), index_col="geography code")
-        features_image.columns = ["image_mean_{}".format(col) for col in features_image.columns]
-        dataset = pd.merge(dataset, features_image, on=['geography code']).dropna()
-
-        print (dataset.describe())
+    print ("READING IN DATA.")
+    dataset =  read_spatial_dataset(the_year)
+    print (dataset.describe())
+    print ("READING IN DONE.")
 
     for condition in all_conditions:
-
         med_condition = "o_{}_quantity_per_capita".format(condition)
-
-        X, y = extract_features_and_labels(dataset, med_condition, modalities+["spatial"])
-        X = X.set_index("geometry")
+        print (f"PROCESSING {med_condition}.")    
+        X, y = extract_features_and_labels(dataset, med_condition, modalities + ['spatial'])
+        X = X.set_index('geometry')
+        
+        X = X[[c for c in X if ( ('image' not in c) or ((('_mean_' in c) or ('_std_' in c)) & (('B01' in c) or ('B06' in c) or  ('B12' in c)))) ]]
         X_vars = list(X.columns)
 
-        print (X_vars)
-        print (X.head())
-        print (y)
+        print ("STANDARDIZING FEATURES.")
+        print (X.head(2))
+        X = standardize_data(X)
+        print (X.head(2))
+        print ("STANDARDIZING DONE.")
 
         print (f"**** Parsing {the_year} year and modality {mod} for condition {condition} ****")
 
@@ -50,13 +49,18 @@ def parse_single_year(the_year, modalities):
         with open(results_folder + f"{the_year}_{condition}_{mod}_summary_output.txt", "w") as file:
             file.write(str(slm.summary))
 
+        print (f"PROCESSING {med_condition} DONE.")  
+
 
     
-# parse_single_year(2020, ["environmental"])
+
 parse_single_year(2020, ["image"])
-parse_single_year(2020, ["sociodemograhic", "environmental", "image"])
+# parse_single_year(2020, ["environmental"])
+parse_single_year(2020, ["sociodemographic", "environmental", "image"])
 
 parse_single_year(2019, ["image"])
 parse_single_year(2019, ["environmental"])
-parse_single_year(2019, ["sociodemograhic"])
-parse_single_year(2019, ["sociodemograhic", "environmental", "image"])
+parse_single_year(2019, ["sociodemographic"])
+parse_single_year(2019, ["sociodemographic", "environmental", "image"])
+
+parse_single_year(2020, ["sociodemographic"])
