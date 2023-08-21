@@ -206,8 +206,10 @@ def merge_with_image_features(dataset):
             image_features_season = os.path.join(image_features_folder, season)
             image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
             image_features = image_features.filter(regex="^(mean)|(std)")
-            # image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
+            image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
+            print (image_features)
             image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
+            print (image_features.columns)
             # dataset = dataset.merge(image_features, left_index=True, right_index=True)
             dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset

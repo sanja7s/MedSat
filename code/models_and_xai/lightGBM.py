@@ -15,7 +15,8 @@ def train_LGB(x_train, y_train, x_val, y_val):
 
     params = {
         'objective': 'regression',
-        'metric': 'rmse'}
+        'metric': 'rmse',
+        'early_stopping_rounds' : 10}
 
     # Create LightGBM datasets
     train_data = lgb.Dataset(x_train, label=y_train)
@@ -23,7 +24,7 @@ def train_LGB(x_train, y_train, x_val, y_val):
     val_data = lgb.Dataset(x_val, label=y_val)
 
     # Train model with early stopping
-    model = lgb.train(params, train_data, valid_sets=[val_data], early_stopping_rounds=10)
+    model = lgb.train(params, train_data, valid_sets=[val_data])
 
     train_r2 = r2_score(y_train, model.predict(x_train))
     val_r2 = r2_score(y_val, model.predict(x_val))
