@@ -13,7 +13,6 @@ In this release, we provide data snapshots for the years 2019 (pre-COVID) and 20
 ![__MEDSAT__  structure](figures/data_diagram_hist.jpg)
 
 
-
 Access to the code is available at this respository, while the data can be found at https://tinyurl.com/medsatpoint. The dataset is released under the CC BY-SA 4.0 license.
 
 
@@ -26,12 +25,13 @@ Access to the code is available at this respository, while the data can be found
     - `sociodemographic_data_parser` -- this notebook allows extraction of sociodemographic features per LSOA from the raw files downloaded from the UK ONS website.
 2.  `models_and_xai` -- contains the code for predicting and explaining health outcomes from the features.
 
+
 ### THE DATA STRUCTURE 
-	1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
-	2. ```point_data``` -- contains __MEDSAT__ and its segments.
-        - ```data_sources``` -- contains raw input donwloaded from the UK Census 2021.
-	    - ```image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
-	    - ```data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
+1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
+2. ```point_data``` -- contains __MEDSAT__ and its segments.
+    - ```data_sources``` -- contains raw input donwloaded from the UK Census 2021.
+    - ```image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
+    - ```data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
 
 	
 
