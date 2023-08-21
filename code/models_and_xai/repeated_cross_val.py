@@ -41,32 +41,9 @@ def get_dataset_spatial_fold_splits(sdataset, year, fold_iterration, val_size=0.
     return fold_splits
 
 
-# SLOO FOLDS
-# def get_dataset_SLOO_fold_splits(sdataset, buffer_radius=1000, test_size=0.5):
-#     """
-
-#     """
-#     spatial_splits = []
-
-#     XYs = sdataset['geometry']
-#     sample_XYs = XYs.sample(1000)
-
-#     cv = spacv.SKCV(n_splits = len(sample_XYs), buffer_radius=10)
-
-#     for train_index,test_index in cv.split(XYs):
-#         train_fold, test_fold = sdataset.iloc[train_index], sdataset.iloc[test_index]
-
-#         train_fold, val_fold = train_test_split(train_fold, test_size=test_size)
-#         print(len(train_fold), len(val_fold), len(test_fold))
-#         spatial_splits.append((train_fold, val_fold, test_fold))
-
-#     return spatial_splits
-
-
-
 def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalities):
     dataset = pd.read_csv(data_folder+'{}_spatial_raw_master.csv'.format(year), index_col='geography code').dropna()
-    dataset = merge_with_image_features(dataset)
+    dataset = merge_with_image_features(dataset).dropna()
 
     cross_validation_times = 5
     folds_test_scores = None
@@ -146,7 +123,7 @@ def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, mo
 
 def perform_spatial_cross_val_for_year(year, model_fn, model_dir):
     #single modality
-    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["image"])
+    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["image"])
     # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic"])
     # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental"])
     #two modalities
@@ -154,13 +131,15 @@ def perform_spatial_cross_val_for_year(year, model_fn, model_dir):
     # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "image"])
     # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image"])
     #three modalities
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image", "sociodemographic"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image", "sociodemographic"])
 
 
 if __name__ == '__main__':
-    perform_spatial_cross_val_for_year(2020, fnn_train_evaluation, "fNN")
-    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
+    # perform_spatial_cross_val_for_year(2020, fnn_train_evaluation, "fNN")
+    # perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
 
-    #perform_spatial_cross_val_for_year(2019, train_evaluate_light_gbm, "lightGBM")
+    # perform_spatial_cross_val_for_year(2020, train_evaluate_light_gbm, "lightGBM")
+
+    perform_repeated_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["image"])
 
 
