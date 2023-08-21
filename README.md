@@ -29,6 +29,7 @@ Access to the code is available at this respository, while the data can be found
 ### THE DATA STRUCTURE 
 1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
 2. ```point_data``` -- contains __MEDSAT__ and its segments.
+    - ```{year}_spatial_raw_master.csv``` and ```{year}_spatial_raw_master.geojson``` -- the __MEDSAT__ master files.
     - ```data_sources``` -- contains raw input donwloaded from the UK Census 2021.
     - ```image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
     - ```data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
