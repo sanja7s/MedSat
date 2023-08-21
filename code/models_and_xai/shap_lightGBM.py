@@ -74,7 +74,7 @@ def visualize_shap_values(shap_explainer, condition):
     # if condition == "diabetes":
     #     width = 3.3
     fig = plt.figure()
-    shap.summary_plot(shap_explainer, show=False, max_display=15, color_bar=False, cmap="plasma")
+    shap.summary_plot(shap_explainer, show=False, max_display=10, color_bar=False, cmap="plasma")
     plt.gcf().set_size_inches(width, 3.7)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
@@ -111,7 +111,8 @@ def compute_feature_rank(condition, feature_name="population density"):
 if __name__ == '__main__':
 
     target_year = 2020
-    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP",str(target_year))
+    target_modalities = ["image"]
+    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year), "_".join(target_modalities))
     if not os.path.exists(shap_results_base_dir):
         os.makedirs(shap_results_base_dir)
 
@@ -125,15 +126,12 @@ if __name__ == '__main__':
     shap_values_per_condition=[]
     test_features_per_condition = []
     test_labels_per_condition = []
-    target_modalities = ["sociodemographic", "environmental", "image"]
     for i, condition in enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
         x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities)
         x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities)
         x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities)
-
-        print(x_train.shape)
 
         #normalize data
         scaler = StandardScaler()
@@ -144,7 +142,12 @@ if __name__ == '__main__':
         model = train_LGB(x_train_norm, y_train, x_val_norm, y_val)
         predictions = model.predict(x_test_norm)
         test_r2 = r2_score(y_test, predictions)
+
         print('Test R^2: {} for condition {}'.format(test_r2, med_condition))
+        predictions_results = pd.DataFrame({"ACTUAL": y_test, "PREDICTED": predictions}, index=x_test.index)
+        predictions_results["DIFF"] = (predictions_results["ACTUAL"] - predictions_results["PREDICTED"]).pow(2)
+        predictions_results.sort_values(by="DIFF",inplace=True)
+        predictions_results.to_csv(os.path.join(shap_results_base_dir, "test_predictions_{}.csv".format(condition)))
 
         # Compute SHAP values for test set
         #SHAPLEY value interpretation:
