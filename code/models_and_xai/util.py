@@ -164,6 +164,7 @@ results_folder = "../../results/models/"
 processing_folder = "../../processing/models/spatial_cv_folds/"
 descriptive_analysis_dir = "../../data/descriptive/"
 auxiliary_data_folder = "../../data/auxiliary_data/"
+spatialreg_results_folder = "../../results/models/spatialRegression/"
 
 def split_dataset(year, ratio_test=0.3):
     dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
