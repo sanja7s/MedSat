@@ -26,10 +26,10 @@ Access to the code is available at this respository, while the data can be found
     - `sociodemographic_data_parser` -- this notebook allows extraction of sociodemographic features per LSOA from the raw files downloaded from the UK ONS website.
 2.  `models_and_xai` -- contains the code for predicting and explaining health outcomes from the features.
 ### THE DATA STRUCTURE 
-	- `auxiliary_data` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
-	- `point_data/data_sources` -- contains raw input donwloaded from the UK Census 2021.
-	- `point_data/image_features` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
-	- `point_data/data_segments` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
+	- ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
+	- ```point_data/data_sources``` -- contains raw input donwloaded from the UK Census 2021.
+	- ```point_data/image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
+	- ```point_data/data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
 
 	
 
