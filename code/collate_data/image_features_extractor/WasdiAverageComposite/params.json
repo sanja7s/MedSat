@@ -1,0 +1,22 @@
+{
+  "BBOX": {
+    "northEast": {
+      "lat": 55.82,
+      "lng": 1.8
+    },
+    "southWest": {
+      "lat": 49.8,
+      "lng": -6.5
+    }
+  },
+    "PROVIDER": "AUTO",
+	"DELETE": false,
+    "START_DATE": "2019-12-01",
+	"END_DATE": "2019-12-31",
+    "BAND_NAMES": ["B02_10m", "B03_10m", "B04_10m", "B05_20m", "B06_20m", "B07_20m", "B08_10m", "B8A_20m", "B11_20m", "B12_20m"],
+    "SPATIAL_RESOLUTION_M": 10,
+    "OUTPUT_BASENAME": "ENG",
+    "DIAGONAL_KM": 1000,
+    "MAX_DAYS_START_END": 1000,
+    "MAX_N_TILES": 200
+}
