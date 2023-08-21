@@ -25,16 +25,19 @@ Access to the code is available at this respository, while the data can be found
     - `NHS_prescription_parser` -- this module serves for extracting outcomes for __MEDSAT__ from NHS prescription data.
     - `sociodemographic_data_parser` -- this notebook allows extraction of sociodemographic features per LSOA from the raw files downloaded from the UK ONS website.
 2.  `models_and_xai` -- contains the code for predicting and explaining health outcomes from the features.
+
 ### THE DATA STRUCTURE 
-	- ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
-	- ```point_data/data_sources``` -- contains raw input donwloaded from the UK Census 2021.
-	- ```point_data/image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
-	- ```point_data/data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
+	1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
+	2. ```point_data``` -- contains __MEDSAT__ and its segments.
+        - ```data_sources``` -- contains raw input donwloaded from the UK Census 2021.
+	    - ```image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
+	    - ```data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
 
 	
 
 
 > **STEPS**
+
 For each module generating one of the 4 __MEDSAT__ data segments (1-4 below), you will find their own README file inside specifying how to use the code within the module. We also provide a specific conda envrionment .yml specification for each module (or a guide for how to setup GEE in the Google Colab environment in the case of ```environmental_data_extractor```). 
 1. run the jupyter notebooks from ```environmental_data_extractor``` to obtain *environmental point features*. Since this runs in the Google Colab environment, the results will get saved into your Google Drive, and you can download and place them into ```data/point_data/data_segments/{year}_environment.csv```
 2. run ```NHS_prescriptions_parser``` to obtain *prescrption outcomes* for selected conditions. The resulting outputs will get placed into ```data/point_data/data_segments/{year}_outcomes.csv```
