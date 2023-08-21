@@ -52,12 +52,12 @@ def get_missing_values_per_year(year):
     columns_with_missing_values.to_csv("./data/{}_missing_values.csv".format(year))
 
 
-def plot_distribution(year, columns_of_interest, var_name="age group"):
+def plot_distribution(year, columns_of_interest,  modalities, var_name="age group"):
     if not os.path.exists(descriptive_analysis_dir):
         os.makedirs(descriptive_analysis_dir)
 
     # dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
-    read_spatial_dataset(year)
+    dataset = read_spatial_dataset(year)
     features, labels = extract_features_and_labels(dataset, "o_diabetes_quantity_per_capita", modalities)
     features = features[columns_of_interest]
     features = pd.melt(features, var_name=var_name, value_name="percent")
@@ -72,19 +72,20 @@ def plot_distribution(year, columns_of_interest, var_name="age group"):
     plt.close()
 
 def plot_light_gbm_fnn_results(year, modalities=all_modalities):
-    light_gbm_results_file = "./results/models/lightGBM/repeated_kfold/{}_{}.csv".format(year, "_".join(modalities))
+
+    light_gbm_results_file = os.path.join(results_folder, "lightGBM", "repeated_spatial_kfold", "{}__{}.csv".format(year, "_".join(modalities)))
     light_gbm_results = pd.read_csv(light_gbm_results_file, index_col=0)
     light_gbm_results_long = pd.melt(light_gbm_results, var_name="condition", value_name="R2")
     light_gbm_results_long["model"] = "LightGBM"
 
-    fnn_results_file = "./results/models/fnn/repeated_kfold/{}_{}.csv".format(year, "_".join(modalities))
+    fnn_results_file = os.path.join(results_folder, "fNN", "repeated_spatial_kfold", "{}__{}.csv".format(year, "_".join(modalities)))
     fnn_results = pd.read_csv(fnn_results_file, index_col=0)
     fnn_results_long = pd.melt(fnn_results, var_name="condition", value_name="R2")
     fnn_results_long["model"] = "fNN"
 
     summary_results = pd.concat([light_gbm_results_long, fnn_results_long], ignore_index=True, sort=False)
 
-    model_comparison_dir = "./results/model_comparison/"
+    model_comparison_dir = os.path.join(results_folder, "model_comparison")
     if not os.path.exists(model_comparison_dir):
         os.makedirs(model_comparison_dir)
 
@@ -105,4 +106,4 @@ def plot_light_gbm_fnn_results(year, modalities=all_modalities):
 
 
 if __name__ == '__main__':
-    plot_distribution(2019, gender_columns, "gender")
+    plot_light_gbm_fnn_results(2020, ["environmental", "image", "sociodemographic"])
