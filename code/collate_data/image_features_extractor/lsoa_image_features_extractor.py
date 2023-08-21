@@ -9,8 +9,9 @@ import numpy as np
 
 band_names = ["B01", "B02", "B03", "B04", "B05", "B06", "B07", "B08", "B8A", "B11", "B12"]
 
-def save_lsoa_as_tiff(image_dir, sen2_composite, lsoa_id, lsoa_crop, lsoa_transform):
-    lsoa_pixels_output_dir = os.path.join(image_dir, "lsoa_images")
+def save_lsoa_as_tiff(lsoa_image_root_dir, sen2_composite, lsoa_id, lsoa_crop, lsoa_transform):
+    print("Visualizing lsoa {}".format(lsoa_id))
+    lsoa_pixels_output_dir = os.path.join(lsoa_image_root_dir, "lsoa_images")
     if not os.path.exists(lsoa_pixels_output_dir):
         os.makedirs(lsoa_pixels_output_dir)
 
@@ -54,7 +55,12 @@ def aggregate_pixel_statistics(image_features):
                      axis=1)
 
 
-def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
+def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize):
+
+    sen_2_season = os.path.split(image_dir)[1]
+    output_file_root_dir = os.path.join("../../../data/point_data/image_features/", sen_2_season)
+    if not os.path.exists(output_file_root_dir):
+        os.makedirs(output_file_root_dir)
 
     lsoa_shapefile = os.path.join(lsoa_shapefile_root_dir, "LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC).shp")
     lsoa_shapes = geopandas.read_file(lsoa_shapefile)
@@ -73,7 +79,8 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
                     lsoa_pixels_statistics, col_names = extract_lsoa_pixel_statistics(out_image, sen2_composite.nodata)
                     lsoa_pixels_agg = [lsoa_id, image_file] + lsoa_pixels_statistics
                     associations.append(lsoa_pixels_agg)
-                    #save_lsoa_as_tiff(image_dir, sen2_composite, lsoa_id, out_image, out_transform)
+                    if lsoa_id in lsoas_to_visualize:
+                        save_lsoa_as_tiff(output_file_root_dir, sen2_composite, lsoa_id, out_image, out_transform)
                     match_found = True
                 except:
                     pass
@@ -86,11 +93,6 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir):
     lsoa_image_data = pd.DataFrame(associations, columns=col_names)
     image_features = aggregate_pixel_statistics(lsoa_image_data)
 
-    sen_2_season = os.path.split(image_dir)[1]
-    output_file_root_dir = os.path.join("../../../data/point_data/image_features/", sen_2_season)
-    if not os.path.exists(output_file_root_dir):
-        os.makedirs(output_file_root_dir)
-
     image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixel_statistics.csv"))
     lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_mapping.csv"))
 
@@ -98,6 +100,9 @@ if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
 
-    image_dir = "../../../data/image_data/England_DFJ20192020"
+    image_dir = "../../../data/image_data/England_JJA2020"
+    lsoas_to_visualize = ["E01011188", "E01030115", "E01018367", "E01026962", "E01033060", "E01028694", "E01031189", "E01032149", "E01009962", "E01033053",
+                          "E01026195", "E01005416", "E01027471", "E01014739", "E01028742",
+                          "E01008148", "E01005464", "E01018911","E01010231", "E01010172", "E01010444", "E01008948", "E01009047"]
 
-    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir)
+    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize)

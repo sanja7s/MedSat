@@ -99,9 +99,6 @@ def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalit
 
 # SPATIAL EVALUATION
 def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, modalities=all_modalities):
-    """
-    the geojson is read, so that we can split the LSOAs based on their centroid distances
-    """
     sdataset = read_spatial_dataset(year)
 
     cross_validation_times = 5
@@ -149,21 +146,21 @@ def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, mo
 
 def perform_spatial_cross_val_for_year(year, model_fn, model_dir):
     #single modality
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["image"])
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic"])
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["image"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental"])
     #two modalities
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "environmental"])
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "image"])
-    perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "environmental"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["sociodemographic", "image"])
+    # perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image"])
     #three modalities
     perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=["environmental", "image", "sociodemographic"])
 
 
 if __name__ == '__main__':
-    #perform_spatial_cross_val_for_year(2020, train_evaluate_light_gbm, "lightGBM")
+    perform_spatial_cross_val_for_year(2020, fnn_train_evaluation, "fNN")
+    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
+
     #perform_spatial_cross_val_for_year(2019, train_evaluate_light_gbm, "lightGBM")
 
-    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
-    perform_spatial_cross_val_for_year(2019, fnn_train_evaluation, "fNN")
 

@@ -158,7 +158,7 @@ regex_per_modality = {
     "spatial": '^(geometry)'
 }
 
-data_folder = "../../data/point_data/collated_data/"
+data_folder = "../../data/point_data/"
 image_features_folder = os.path.join(data_folder, "image_features")
 results_folder = "../../results/models/"
 processing_folder = "../../processing/models/spatial_cv_folds/"
@@ -205,6 +205,8 @@ def merge_with_image_features(dataset):
         for season in os.listdir(image_features_folder):
             image_features_season = os.path.join(image_features_folder, season)
             image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
+            image_features = image_features.filter(regex="^(mean)|(std)")
+            # image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
             image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
             # dataset = dataset.merge(image_features, left_index=True, right_index=True)
             dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
