@@ -9,9 +9,6 @@ import spreg
 from libpysal.weights import Queen
 
 
-data_folder = "../../data/point_data/collated_data/"
-results_folder = "../../results/models/spatialRegression/"
-image_features_folder = os.path.join(data_folder, "image_features", "England_JJA2020")
 
 
 def parse_single_year(the_year, modalities):
@@ -19,7 +16,7 @@ def parse_single_year(the_year, modalities):
     mod = "_".join(modalities)
 
     print ("READING IN DATA.")
-    dataset =  read_spatial_dataset(the_year)
+    dataset =  read_spatial_dataset(the_year).dropna()
     print (dataset.describe())
     print ("READING IN DONE.")
 
@@ -46,7 +43,7 @@ def parse_single_year(the_year, modalities):
         slm = spreg.ML_Lag(y, X.values, method='LU', w=w, name_y=med_condition, name_x=X_vars)
         print(slm.summary)
 
-        with open(results_folder + f"{the_year}_{condition}_{mod}_summary_output.txt", "w") as file:
+        with open(spatialreg_results_folder + f"{the_year}_{condition}_{mod}_summary_output.txt", "w") as file:
             file.write(str(slm.summary))
 
         print (f"PROCESSING {med_condition} DONE.")  
@@ -54,8 +51,9 @@ def parse_single_year(the_year, modalities):
 
     
 
-parse_single_year(2020, ["image"])
+# parse_single_year(2020, ["image"])
 # parse_single_year(2020, ["environmental"])
+parse_single_year(2020, ["sociodemographic"])
 parse_single_year(2020, ["sociodemographic", "environmental", "image"])
 
 parse_single_year(2019, ["image"])
@@ -63,4 +61,4 @@ parse_single_year(2019, ["environmental"])
 parse_single_year(2019, ["sociodemographic"])
 parse_single_year(2019, ["sociodemographic", "environmental", "image"])
 
-parse_single_year(2020, ["sociodemographic"])
+

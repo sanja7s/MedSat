@@ -45,6 +45,12 @@ def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalit
     dataset = pd.read_csv(data_folder+'{}_spatial_raw_master.csv'.format(year), index_col='geography code').dropna()
     dataset = merge_with_image_features(dataset).dropna()
 
+    # print ("STANDARDIZING FEATURES.")
+    # print (dataset.head(2))
+    # dataset = standardize_data(dataset)
+    # print (dataset.head(2))
+    # print ("STANDARDIZING DONE.")
+
     cross_validation_times = 5
     folds_test_scores = None
     for i in range(cross_validation_times):
@@ -141,6 +147,9 @@ if __name__ == '__main__':
 
     perform_spatial_cross_val_for_year(2020, train_evaluate_light_gbm, "lightGBM")
     perform_spatial_cross_val_for_year(2020, fnn_train_evaluation, "fNN")
-    #perform_spatial_cross_val_for_year(2019, train_evaluate_light_gbm, "lightGBM")
+
+    # perform_repeated_spatial_cross_val(2020, train_evaluate_light_gbm, "lightGBM", modalities=["image"])
+
+
 
 

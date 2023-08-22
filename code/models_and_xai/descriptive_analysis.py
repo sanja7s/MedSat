@@ -26,7 +26,7 @@ def plot_correlation_among_features(year, target_modality, features_to_show):
     if not os.path.exists(descriptive_analysis_dir):
         os.makedirs(descriptive_analysis_dir)
 
-    dataset = pd.read_csv('../data/collated_data/{}_raw_master.csv'.format(year), index_col=['geography code'])
+    dataset = read_spatial_dataset(year)
     features, labels = extract_features_and_labels(dataset, "o_diabetes_quantity_per_capita", [target_modality])
     features = features.rename(columns=variable_mapping)
     correlation_matrix = features.corr()
@@ -42,8 +42,7 @@ def plot_correlation_among_features(year, target_modality, features_to_show):
     plt.close()
 
 def get_missing_values_per_year(year):
-    # dataset = pd.read_csv('../data/collated_data/{}_raw_master.csv'.format(year), index_col=['geography code'])
-    read_spatial_dataset(year)
+    dataset = read_spatial_dataset(year)
     missing_values = dataset.isnull()
     total_rows_missing = missing_values.any(axis=1).sum()
     print("{} instances have missing values for year {}".format(total_rows_missing, year))
@@ -56,7 +55,6 @@ def plot_distribution(year, columns_of_interest,  modalities, var_name="age grou
     if not os.path.exists(descriptive_analysis_dir):
         os.makedirs(descriptive_analysis_dir)
 
-    # dataset = pd.read_csv('./data/{}_raw_master.csv'.format(year), index_col=['geography code'])
     dataset = read_spatial_dataset(year)
     features, labels = extract_features_and_labels(dataset, "o_diabetes_quantity_per_capita", modalities)
     features = features[columns_of_interest]
@@ -107,3 +105,4 @@ def plot_light_gbm_fnn_results(year, modalities=all_modalities):
 
 if __name__ == '__main__':
     plot_light_gbm_fnn_results(2020, ["environmental", "image", "sociodemographic"])
+    # plot_correlation_among_features(2020, "environmental", env_features_to_show)
