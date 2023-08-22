@@ -106,3 +106,7 @@ def plot_light_gbm_fnn_results(year, modalities=all_modalities):
 if __name__ == '__main__':
     plot_light_gbm_fnn_results(2020, ["environmental", "image", "sociodemographic"])
     # plot_correlation_among_features(2020, "environmental", env_features_to_show)
+    plot_distribution(2020,
+                      columns_of_interest=["Asian ethnicity", "Black ethnicity", "Mixed ethnicity", "White ethnicity"],
+                      modalities=["sociodemographic"],
+                      var_name="Ethnicity")

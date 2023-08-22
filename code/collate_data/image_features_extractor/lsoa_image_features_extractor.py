@@ -55,7 +55,7 @@ def aggregate_pixel_statistics(image_features):
                      axis=1)
 
 
-def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize):
+def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize=None):
 
     sen_2_season = os.path.split(image_dir)[1]
     output_file_root_dir = os.path.join("../../../data/point_data/image_features/", sen_2_season)
@@ -79,7 +79,7 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
                     lsoa_pixels_statistics, col_names = extract_lsoa_pixel_statistics(out_image, sen2_composite.nodata)
                     lsoa_pixels_agg = [lsoa_id, image_file] + lsoa_pixels_statistics
                     associations.append(lsoa_pixels_agg)
-                    if lsoa_id in lsoas_to_visualize:
+                    if lsoas_to_visualize is not None and lsoa_id in lsoas_to_visualize:
                         save_lsoa_as_tiff(output_file_root_dir, sen2_composite, lsoa_id, out_image, out_transform)
                     match_found = True
                 except:
@@ -99,10 +99,6 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
 if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
-
     image_dir = "../../../data/image_data/England_JJA2020"
-    lsoas_to_visualize = ["E01011188", "E01030115", "E01018367", "E01026962", "E01033060", "E01028694", "E01031189", "E01032149", "E01009962", "E01033053",
-                          "E01026195", "E01005416", "E01027471", "E01014739", "E01028742",
-                          "E01008148", "E01005464", "E01018911","E01010231", "E01010172", "E01010444", "E01008948", "E01009047", "E01009926", "E01010428", "E01005779", "E01005478", "E01004798", "E01008986"]
 
-    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize)
+    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir)
