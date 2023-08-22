@@ -92,10 +92,10 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
     col_names = ["geography code", "SEN-2_ID"] + col_names
     lsoa_image_data = pd.DataFrame(associations, columns=col_names)
     image_features = aggregate_pixel_statistics(lsoa_image_data)
-    lsoa_image_data = lsoa_image_data[["geography code", "SEN-2_ID"]]
+    lsoa_image_mapping = lsoa_image_data[["geography code", "SEN-2_ID"]]
 
     image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixel_statistics.csv"))
-    lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_image_mapping.csv"))
+    lsoa_image_mapping.to_csv(os.path.join(output_file_root_dir, "lsoa_image_mapping.csv"))
 
 if __name__ == '__main__':
 
