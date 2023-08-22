@@ -13,6 +13,7 @@ import lightgbm as lgb
 import shap
 import pickle
 from sklearn.preprocessing import StandardScaler
+from sklearn.inspection import PartialDependenceDisplay
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
@@ -68,6 +69,22 @@ def plot_individual_LSOAs(lsoa_id, dataset, shap_values, condition):
     plt.tight_layout()
     plt.show()
 
+def visualize_dependence_plot(shap_values, x_test, condition):
+    width = 6.5
+    # if condition == "diabetes":
+    #     width = 3.3
+    fig = plt.figure()
+    shap.dependence_plot("PM2.5", shap_values.values, x_test, show=False)
+    plt.gcf().set_size_inches(width, 4)
+    plt.yticks(fontsize=8)
+    plt.xticks(fontsize=8)
+
+    plt.title("Dependence Plot for {} prescriptions".format(condition), fontsize=10)
+    fig.tight_layout()
+    plt.savefig(os.path.join(shap_results_base_dir, "PDP_{}.pdf".format(condition)), dpi=300)
+    plt.close()
+
+
 #latex article class has witdh of 397.484pt
 def visualize_shap_values(shap_explainer, condition):
     width = 4
@@ -111,7 +128,7 @@ def compute_feature_rank(condition, feature_name="population density"):
 if __name__ == '__main__':
 
     target_year = 2020
-    target_modalities = ["image"]
+    target_modalities = ["image", "sociodemographic", "environmental"]
     shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year), "_".join(target_modalities))
     if not os.path.exists(shap_results_base_dir):
         os.makedirs(shap_results_base_dir)
@@ -149,6 +166,8 @@ if __name__ == '__main__':
         predictions_results.sort_values(by="DIFF",inplace=True)
         predictions_results.to_csv(os.path.join(shap_results_base_dir, "test_predictions_{}.csv".format(condition)))
 
+
+
         # Compute SHAP values for test set
         #SHAPLEY value interpretation:
         print("Initializing SHAP explainer for: {}".format(med_condition))
@@ -158,6 +177,10 @@ if __name__ == '__main__':
         shap_values_train = explainer(x_train_norm)
         shap_values_val = explainer(x_val_norm)
         shap_values_test = explainer(x_test_norm)
+
+        print("Computing SHAP dependence plot")
+        visualize_dependence_plot(shap_values_test, x_test, condition)
+
         shap_values_train_df = pd.DataFrame(shap_values_train.values, columns=x_train.columns, index=x_train.index)
         shap_values_val_df = pd.DataFrame(shap_values_val.values, columns=x_val.columns, index=x_val.index)
         shap_values_test_df = pd.DataFrame(shap_values_test.values, columns=x_test.columns, index=x_test.index)
