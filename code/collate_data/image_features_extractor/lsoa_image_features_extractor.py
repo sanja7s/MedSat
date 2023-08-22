@@ -80,7 +80,7 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
                     lsoa_pixels_agg = [lsoa_id, image_file] + lsoa_pixels_statistics
                     associations.append(lsoa_pixels_agg)
                     if lsoas_to_visualize is not None and lsoa_id in lsoas_to_visualize:
-                        save_lsoa_as_tiff(output_file_root_dir, sen2_composite, lsoa_id, out_image, out_transform)
+                        save_lsoa_as_tiff(image_dir, sen2_composite, lsoa_id, out_image, out_transform)
                     match_found = True
                 except:
                     pass
@@ -92,13 +92,14 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
     col_names = ["geography code", "SEN-2_ID"] + col_names
     lsoa_image_data = pd.DataFrame(associations, columns=col_names)
     image_features = aggregate_pixel_statistics(lsoa_image_data)
+    lsoa_image_data = lsoa_image_data[["SEN-2_ID"]]
 
     image_features.to_csv(os.path.join(output_file_root_dir, "lsoas_pixel_statistics.csv"))
-    lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_mapping.csv"))
+    lsoa_image_data.to_csv(os.path.join(output_file_root_dir, "lsoa_image_mapping.csv"))
 
 if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
     image_dir = "../../../data/image_data/England_JJA2020"
-
-    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir)
+    lsoas_to_visualize = ["E01014370"]
+    extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize)
