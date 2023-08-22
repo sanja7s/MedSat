@@ -14,9 +14,9 @@ In this release, we provide data snapshots for the years 2019 (pre-COVID) and 20
 
 
 The data can be found at TUMMedia (data sharing service from Technical University Munich):
-    https://mediatum.ub.tum.de/login
-    Login: obadic-1714817-review
-    Pass: PuE1&L!maQ;81Hfd-DwPsNa19
+    https://mediatum.ub.tum.de/login \
+    Login: obadic-1714817-review \ 
+    Pass: PuE1&L!maQ;81Hfd-DwPsNa19 \
 The dataset is released under the CC BY-SA 4.0 license.
 
 
