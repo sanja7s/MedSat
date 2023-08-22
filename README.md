@@ -34,7 +34,7 @@ The dataset is released under the CC BY-SA 4.0 license.
 1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
 2. ```point_data``` -- contains __MEDSAT__ and its segments.
     - ```{year}_spatial_raw_master.csv``` and ```{year}_spatial_raw_master.geojson``` -- the __MEDSAT__ master files.
-    - ```data_sources``` -- contains raw input donwloaded from the UK Census 2021.
+    - ```data_sources``` -- contains raw input downloaded from the UK Census 2021.
     - ```image_features``` -- contains the features extracted from each image composite band across LSOAs for two seasons: winter (DJF), and summer (JJA) for the year 2020.
     - ```data_segments``` -- this is where the results from each module parsing different data sources are placed to be merged into yearly master files.
 
@@ -46,11 +46,11 @@ The dataset is released under the CC BY-SA 4.0 license.
 
 2. Run the code in ```models_and_xai``` to analyse the __MEDSAT__ dataset.
 
-3. If you want to re-create any segements of __MEDSAT__ you can run the respective module for generating it (1-4 below). For each module, you will find their own README file inside specifying how to use the code within the module. We also provide a specific conda envrionment .yml specification for each module (or a guide for how to setup GEE in the Google Colab environment in the case of ```environmental_data_extractor```). 
-    - run the jupyter notebooks from ```environmental_data_extractor``` to obtain *environmental point features*. Since this runs in the Google Colab environment, the results will get saved into your Google Drive, and you can download and place them into ```data/point_data/data_segments/{year}_environment.csv```
-    - run ```NHS_prescriptions_parser``` to obtain *prescrption outcomes* for selected conditions. The resulting outputs will get placed into ```data/point_data/data_segments/{year}_outcomes.csv```
-    - `WasdiAverageComposite` runs on WASDI servers to obtain *environmental image features*, i.e., 37 x 4 seasonal Sentinel-2 composite images (totalling ~120 GB per season, i.e., ~600 GB per year). This data is saved on the TUM server (on the data address provided at the beginning of this file). You can download (a part of) this data into ```data/image_data/``` to continue parsing them with the code provided here.
-    - run ```sociodemographic_data_parser``` to obtain *sociodemographic features* from the UK census. They will get placed into ```data/point_data/data_segments/controls.csv```
+3. If you want to re-create any segements of __MEDSAT__, you can run the respective module for generating it (1-4 below). For each module, you will find their own README file inside specifying how to use the code within the module. We also provide a specific conda envrionment .yml specification for each module (or a guide for how to setup GEE in the Google Colab environment in the case of ```environmental_data_extractor```). 
+    - 1) run the jupyter notebooks from ```environmental_data_extractor``` to obtain *environmental point features*. Since this runs in the Google Colab environment, the results will get saved into your Google Drive, and you can download and place them into ```data/point_data/data_segments/{year}_environment.csv```
+    - 2) run ```NHS_prescriptions_parser``` to obtain *prescrption outcomes* for selected conditions. The resulting outputs will get placed into ```data/point_data/data_segments/{year}_outcomes.csv```
+    - 3) `WasdiAverageComposite` runs on WASDI servers to obtain *environmental image features*, i.e., 37 x 4 seasonal Sentinel-2 composite images (totalling ~120 GB per season, i.e., ~600 GB per year). This data is saved on the TUM server (on the data address provided at the beginning of this file). You can download (a part of) this data into ```data/image_data/``` to continue parsing them with the code provided here.
+    - 4) run ```sociodemographic_data_parser``` to obtain *sociodemographic features* from the UK census. They will get placed into ```data/point_data/data_segments/controls.csv```
     - ```collate data``` pulls the four extracted data segments into a single *master file* per year saved into ```data/point_data/{year}_spatial_raw_master``` both as .csv and .geojson. 
 
 
