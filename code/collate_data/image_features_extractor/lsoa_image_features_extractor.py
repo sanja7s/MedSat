@@ -69,6 +69,8 @@ def extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_vis
 
     for image_file in os.listdir(image_dir):
         image_abs_path = os.path.join(image_dir, image_file)
+        if not (image_file.endswith(".tiff") or image_file.endswith(".tif")):
+            continue
         with rasterio.open(image_abs_path) as sen2_composite:
             match_found=False
             lsoa_shapes = lsoa_shapes.to_crs(crs=sen2_composite.crs)
@@ -101,5 +103,6 @@ if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
     image_dir = "../../../data/image_data/England_JJA2020"
-    lsoas_to_visualize = ["E01014370"]
+    # lsoas_to_visualize = ["E01014370"]
+    lsoas_to_visualize = None
     extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize)
