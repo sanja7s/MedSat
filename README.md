@@ -13,7 +13,7 @@ In this release, we provide data snapshots for the years 2019 (pre-COVID) and 20
 ![__MEDSAT__  structure](figures/data_diagram_hist.jpg)
 
 
-### DATA ACCESS
+## DATA ACCESS
 The data can be found at TUMMedia (data sharing service from Technical University Munich):
     https://mediatum.ub.tum.de/1714817 \
     Login: obadic-1714817-review  | 
@@ -21,7 +21,7 @@ The data can be found at TUMMedia (data sharing service from Technical Universit
 The dataset is released under the CC BY-SA 4.0 license.
 
 
-## STRUCUTURE
+## STRUCTURE
 
 ### THE CODE STRUCTURE 
 1. `collate_data` -- contains the code for producing the four data components from different sources, and merging them into a single dataset, __MEDSAT__.
@@ -43,7 +43,7 @@ The dataset is released under the CC BY-SA 4.0 license.
 
 	
 
-### RUNNING THE CODE
+## RUNNING THE CODE
 
 > **STEPS**
 1. Download the data from TUMMedia. The structure from the server is mirrored here, which means that you can place the content of ```auxiliary_data``` from the sever into ```auxiliary_data``` in the resposotory and the same for other data folders.
@@ -60,7 +60,7 @@ The dataset is released under the CC BY-SA 4.0 license.
 
 
 
-### PEAKS INTO THE DATASET
+## PEAKS INTO THE DATASET
 
 #### Example __MEDSAT__  point features
 ![example __MEDSAT__  point features](figures/maps_data_diagram.jpg)
