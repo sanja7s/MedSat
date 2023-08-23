@@ -21,6 +21,8 @@ The data can be found at TUMMedia (data sharing service from Technical Universit
 The dataset is released under the CC BY-SA 4.0 license.
 
 
+## STRUCUTURE
+
 ### THE CODE STRUCTURE 
 1. `collate_data` -- contains the code for producing the four data components from different sources, and merging them into a single dataset, __MEDSAT__.
     - `data_master.ipynb` -- this code collates the 4 components into single *master data files* for each year. It produces both .csv and .geojson master files as output.
@@ -41,6 +43,7 @@ The dataset is released under the CC BY-SA 4.0 license.
 
 	
 
+### RUNNING THE CODE
 
 > **STEPS**
 1. Download the data from TUMMedia. The structure from the server is mirrored here, which means that you can place the content of ```auxiliary_data``` from the sever into ```auxiliary_data``` in the resposotory and the same for other data folders.
