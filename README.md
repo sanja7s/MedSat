@@ -32,7 +32,7 @@ The dataset is released under the CC BY-SA 4.0 license.
 
 
 ### THE DATA STRUCTURE 
-1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Redion shapefiles. 
+1. ```auxiliary_data``` -- holds spatial data, i.e., LSOA and Region shapefiles. 
 2. ```point_data``` -- contains __MEDSAT__ and its components.
     - ```{year}_spatial_raw_master.csv``` and ```{year}_spatial_raw_master.geojson``` -- the __MEDSAT__ master files.
     - ```data_sources``` -- contains raw input downloaded from the UK Census 2021.
