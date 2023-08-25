@@ -1,0 +1,59 @@
+,BNF_code,Drug_name,Mapped_Condition
+114,1001030V0,Abatacept,rheumatoid
+362,1001030S0,Adalimumab,rheumatoid
+84,1001030R0,Anakinra,rheumatoid
+325,1001030A0,Auranofin,rheumatoid
+147,0802010G0,Azathioprine,rheumatoid
+316,1001030AC,Baricitinib,rheumatoid
+81,1502010C0,Bupivacaine Hydrochloride,rheumatoid
+307,1502010Z0,Bupivacaine Hydrochloride & Fentanyl Cit,rheumatoid
+245,1001010AH,Celecoxib,rheumatoid
+240,1001030Y0,Certolizumab Pegol,rheumatoid
+216,0504010F0,Chloroquine Phosphate,rheumatoid
+331,0504010G0,Chloroquine Sulfate,rheumatoid
+32,1001010M0,Choline Magnesium Trisalicylate,rheumatoid
+218,1108010AA,Ciclosporin,rheumatoid
+102,0802020G0,Ciclosporin,rheumatoid
+119,0605010J0,Corticotropin,rheumatoid
+246,1001010AG,Diclofenac Potassium,rheumatoid
+113,1003020U0,Diclofenac Sodium,rheumatoid
+44,1001010D0,Diflunisal,rheumatoid
+162,1001030D0,Etanercept,rheumatoid
+17,1001010E0,Etodolac,rheumatoid
+77,1001010G0,Fenoprofen,rheumatoid
+364,1001010I0,Flurbiprofen,rheumatoid
+253,1104020G0,Flurbiprofen Sodium,rheumatoid
+351,1001030X0,Golimumab,rheumatoid
+48,1104010M0,Hydrocortisone Acetate,rheumatoid
+136,1001030C0,Hydroxychloroquine Sulfate,rheumatoid
+361,1003020P0,Ibuprofen,rheumatoid
+258,1001010J0,Ibuprofen,rheumatoid
+247,1001010AD,Ibuprofen Lysine,rheumatoid
+54,0309020AA,Ibuprofen/Pseudoephed HCl,rheumatoid
+27,1104020L0,Indometacin,rheumatoid
+129,1001010K0,Indometacin,rheumatoid
+302,1001030T0,Infliximab,rheumatoid
+132,100302010,Ketoprofen,rheumatoid
+203,1001030L0,Leflunomide,rheumatoid
+248,1001010AA,Meloxicam,rheumatoid
+190,1001030U0,Methotrexate,rheumatoid
+265,1001010X0,Nabumetone,rheumatoid
+152,1001010P0,Naproxen,rheumatoid
+249,100101070,Naproxen Sodium,rheumatoid
+309,1001030F0,Penicillamine,rheumatoid
+124,1003020R0,Piroxicam,rheumatoid
+228,0802030F0,Rituximab,rheumatoid
+3,1001030AD,Sarilumab,rheumatoid
+372,1001030J0,Sodium Aurothiomalate,rheumatoid
+103,0105010E0,Sulfasalazine,rheumatoid
+233,1001010S0,Sulindac,rheumatoid
+301,1305030C0,Tacrolimus,rheumatoid
+186,100101040,Tenoxicam,rheumatoid
+313,0605010T0,Tetracosactide,rheumatoid
+217,1001010T0,Tiaprofenic Acid,rheumatoid
+0,1001030AB,Tofacitinib,rheumatoid
+9,1001010V0,Tolmetin,rheumatoid
+107,0603020Y0,Triamcinolone,rheumatoid
+153,1304000Z0,Triamcinolone Acetonide,rheumatoid
+133,0302000T0,Triamcinolone Acetonide,rheumatoid
+138,1001022Y0,Triamcinolone Hexacetonide,rheumatoid

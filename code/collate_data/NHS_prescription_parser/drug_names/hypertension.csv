@@ -1,0 +1,105 @@
+,BNF_code,Drug_name,Mapped_Condition
+148,0204000C0,Acebutolol Hydrochloride,hypertension
+251,0203020C0,Adenosine,hypertension
+296,0205053A0,Aliskiren,hypertension
+104,0205010X0,Ambrisentan,hypertension
+371,0202030C0,Amiloride Hydrochloride,hypertension
+295,0206020A0,Amlodipine,hypertension
+333,1108020J0,Apraclonidine,hypertension
+338,0204000E0,Atenolol,hypertension
+137,0204000U0,Atenolol With Calcium Channel Blocker,hypertension
+322,0205052AD,Azilsartan Medoxomil,hypertension
+62,0202010B0,Bendroflumethiazide,hypertension
+2,0202080B0,Bendroflumethiazide/Potassium,hypertension
+16,1106000I0,Betaxolol,hypertension
+109,0204000G0,Betaxolol Hydrochloride,hypertension
+285,1106000AF,Bimatoprost,hypertension
+8,0204000H0,Bisoprolol Fumarate,hypertension
+24,0204000AC,Bisoprolol Fumarate/Aspirin,hypertension
+270,0205010U0,Bosentan,hypertension
+288,1106000AC,Brinzolamide,hypertension
+291,1106000AJ,Brinzolamide & Timolol,hypertension
+289,1106000AL,Brinzolamide/Brimonidine,hypertension
+127,0205052C0,Candesartan Cilexetil,hypertension
+324,0205051F0,Captopril,hypertension
+212,020400080,Carvedilol,hypertension
+280,0202010D0,Chlorothiazide,hypertension
+6,0205051E0,Cilazapril,hypertension
+10,0205020E0,Clonidine Hydrochloride,hypertension
+234,0107010AA,Diltiazem Hydrochloride,hypertension
+188,0205040D0,Doxazosin Mesilate,hypertension
+343,0205051I0,Enalapril Maleate,hypertension
+20,0202030X0,Eplerenone,hypertension
+181,0205052W0,Eprosartan,hypertension
+336,020400070,Esmolol Hydrochloride,hypertension
+304,0206020F0,Felodipine,hypertension
+282,0205051J0,Fosinopril Sodium,hypertension
+230,0202020L0,Furosemide,hypertension
+12,0202080K0,Furosemide/Potassium,hypertension
+33,0107040A0,Glyceryl Trinitrate,hypertension
+244,0404000V0,Guanfacine,hypertension
+219,0205020G0,Guanfacine Hydrochloride,hypertension
+75,0205010J0,Hydralazine Hydrochloride,hypertension
+172,0202010L0,Hydrochlorothiazide,hypertension
+225,0202080M0,Hydrochlorothiazide/Potassium,hypertension
+332,0205010V0,Iloprost,hypertension
+50,0202010P0,Indapamide,hypertension
+30,0205052I0,Irbesartan,hypertension
+171,0206010I0,Isosorbide Dinitrate,hypertension
+195,0206020I0,Isradipine,hypertension
+319,0204000I0,Labetalol Hydrochloride,hypertension
+242,1106000L0,Latanoprost,hypertension
+287,1106000AD,Latanoprost & Timolol,hypertension
+335,1106000T0,Levobunolol Hydrochloride,hypertension
+22,0205051L0,Lisinopril,hypertension
+86,0205052N0,Losartan Potassium,hypertension
+94,0205010AA,Macitentan,hypertension
+241,0202010T0,Methyclothiazide,hypertension
+252,0205020H0,Methyldopa,hypertension
+82,0205020J0,Methyldopate Hydrochloride,hypertension
+58,1106000U0,Metipranolol,hypertension
+314,0202010V0,Metolazone,hypertension
+155,0204000J0,Metoprolol Fumarate,hypertension
+284,0204000K0,Metoprolol Tartrate,hypertension
+149,1309000H0,Minoxidil,hypertension
+263,0205051C0,Moexipril Hydrochloride,hypertension
+65,0204000M0,Nadolol,hypertension
+183,0204000X0,Nadolol With Diuretic,hypertension
+23,0204000AB,Nebivolol,hypertension
+79,0206020Q0,Nicardipine Hydrochloride,hypertension
+105,0206020R0,Nifedipine,hypertension
+198,0206020W0,Nisoldipine,hypertension
+39,0205052B0,Olmesartan Medoxomil,hypertension
+323,0205052AB,Olmesartan Medoxomil/Amlodipine,hypertension
+232,0205052Y0,Olmesartan Medoxomil/Hydrochlorothiazide,hypertension
+121,0205051Y0,Perindopril Arginine,hypertension
+298,0205051M0,Perindopril Erbumine,hypertension
+92,0204000P0,Pindolol,hypertension
+235,020400010,Pindolol With Diuretic,hypertension
+28,0205040S0,Prazosin Hydrochloride,hypertension
+269,0204000R0,Propranolol Hydrochloride,hypertension
+255,0205051Q0,Quinapril Hydrochloride,hypertension
+189,0205051R0,Ramipril,hypertension
+185,0103010S0,Ranitidine Bismuth Citrate,hypertension
+194,0103010T0,Ranitidine Hydrochloride,hypertension
+231,0205010AB,Riociguat,hypertension
+150,0202030S0,Spironolactone,hypertension
+315,0202040T0,Spironolactone With Loop Diuretics,hypertension
+60,0704050R0,Tadalafil,hypertension
+108,0205052Q0,Telmisartan,hypertension
+352,0205052R0,Telmisartan with Diuretic,hypertension
+290,0704010T0,Terazosin Hydrochloride,hypertension
+215,0204000V0,Timolol,hypertension
+327,1106000Z0,Timolol,hypertension
+293,1106000AI,Timolol & Bimatoprost,hypertension
+286,1106000AG,Timolol & Brimonidine,hypertension
+292,1106000AH,Timolol & Travoprost,hypertension
+40,0202020U0,Torasemide,hypertension
+202,0205051U0,Trandolapril,hypertension
+126,0205051V0,Trandolapril + Calcium Channel Blocker,hypertension
+211,0202030W0,Triamterene,hypertension
+128,0202040V0,Triamterene With Thiazides,hypertension
+156,0205052V0,Valsartan,hypertension
+110,0205052X0,Valsartan with Diuretic,hypertension
+260,0206020Z0,Valsartan/Amlodipine,hypertension
+310,0206020T0,Verapamil Hydrochloride,hypertension
