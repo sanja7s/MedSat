@@ -62,3 +62,12 @@ The user will send a name of a condition or a symptom, and you must respond in a
 }
 ``` 
 The response should be a wellformed JSON with the mapped drugs for the given condition. 
+
+### Using general condition names. 
+
+This part mathes names of conditions with a drug->condition association graph built from the drugbank crawl. 
+To generate prevalences using condition names 
+
+```python condition_prevalence.py -s YYYYMM -e YYYYMM -c condition_name1 condition_name2```
+
+The prevalences files should be created in data_prep folder, along with a csv file called ```Drugs.csv```that contains associations of named conditions with different drugs and BNF codes.
