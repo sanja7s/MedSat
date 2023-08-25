@@ -1,9 +1,13 @@
 
-from utils import *
+from matching.utils import *
 import argparse
 import glob 
-import networkx as nx
 import pandas as pd
+from matching.commonFunc import str2bool
+from matching.commonFunc import writeResultFiles, calculateTemporalMetrics_LSOA
+from matching.drugMatching import DrugMatcher
+from sources.downloader import Downloader
+from tqdm import tqdm
 
 
 
@@ -14,8 +18,9 @@ if __name__ == '__main__':
     parser.add_argument('-s', "--start" , help="start year and month, format YYYYMM")
     parser.add_argument('-e', "--end" , help="end year and month, format YYYYMM")
     parser.add_argument('-odir', "--output_dir" , help="Directory for output files, default ../data_prep/")
-    parser.add_argument('-idir', "--input_dir" , help="Directory for input nhs files, default: ../../BL_Work/openPrescribe/serialized/. Make sure that you have NHS files downloaded here. There is no sanity check here.")
 
+    input_dir = "./prescriptionfiles/"
+    output_dir = "../data_prep/"
     args = parser.parse_args()
 
     conditions = args.conditions
@@ -24,42 +29,36 @@ if __name__ == '__main__':
     start = str(args.start)
     end = str(args.end)
 
-    idir = args.input_dir
     odir = args.output_dir
 
-    if idir:
-        print('overriding input dir')
-        input_dir = idir
+
     if odir:
         print('overriding output dir')
         output_dir = odir
 
+    downloader = Downloader(sourcesFile="sources/serialized_file_paths.json" , download_dir=input_dir)
+    selected_files = []
+    try:
+        selected_files = downloader.download_range(start , end)
+    except:
+        print("Failed download")
+        exit(-1)
+    files_sub = selected_files
 
-    files = glob.glob(input_dir + '/*.gz')
-    files.sort()
-    start_i = 0
-    end_i = len(files)
-    
-    if start:
-        for i in range(len(files)):
-            year = files[i].split('/')[-1].split('.')[0].strip()
-            if year == start:
-                start_i = i
-    if end:
-        for i in range(len(files)):
-            year = files[i].split('/')[-1].split('.')[0].strip()
-            if year == end:
-                end_i = i
-
-    files_sub = files[start_i:end_i+1]
+    print (f'Running for suplied drugs between months {start} and {end}. The following files were selected \n\n\n')
+    for f in files_sub:
+        print(f)
 
     print (f'Running for {conditions} between months {start} and {end}. The following files were selected \n\n\n')
     for f in files_sub:
         print(f)
 
     
+    matcher = DrugMatcher(mappings_dir = './mappings/')
 
-    DiseaseDrugs, drugMap = DrugMatching(conditions , args.isCat)
+    DiseaseDrugs, drugMap = matcher.DrugMatching(conditions)
+    
+    print(DiseaseDrugs)
     
     for k in drugMap:
         print(k , drugMap[k])
@@ -75,10 +74,7 @@ if __name__ == '__main__':
     for f in tqdm(files_sub):
         month = f.split('/')[-1].split('.')[0]
         print("Working with file  " + f)
-        if int(month) > 201312:
-            old = False
-        else:
-            old = True
+        old = False
         
         monthly_borough_dosage_new[month] = {}
         monthly_borough_costs_new[month] = {}
@@ -104,6 +100,4 @@ if __name__ == '__main__':
 
 
     writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new , conditions , output_dir, old)
-    dumpDrugs(DiseaseDrugs)
-
     print("Finished processing !!!!! ")

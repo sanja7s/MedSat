@@ -1,6 +1,7 @@
 import networkx as nx
 import pandas as pd
-from utils.utils import findDrugsForCategory,findDrugsByName
+from matching.utils import findDrugsForCategory,findDrugsForDisease
+import argparse
 
 
 class DrugMatcher:
@@ -15,7 +16,7 @@ class DrugMatcher:
         matchedDrugs = {}
         for d in drugNames:
             if not isCat:
-                drugs = findDrugsByName(self.drug_association_graph, d ,self.chem_master)
+                drugs = findDrugsForDisease(self.drug_association_graph, d ,self.chem_master)
             else:
                 drugs = findDrugsForCategory(self.drug_cat_association_graph, d , self.chem_master)
 
@@ -41,4 +42,12 @@ class DrugMatcher:
         drug_map_df.to_csv(self.output_dir + 'Drugs.csv',index=False)
 
 
-    
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-c' , '--condition' ,nargs="+" ,help=" Condition for which we need drugs ")
+    args = parser.parse_args()
+    condition = args.condition
+    print("Running for : ",condition)
+    matcher = DrugMatcher()
+    print(matcher.DrugMatching(condition))
