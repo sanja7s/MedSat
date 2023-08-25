@@ -93,11 +93,11 @@ if __name__ == '__main__':
             drugs = drugMap[disease]
             opioids = pdp.loc[pdp['16'].isin(drugs)] #Original opioids
 
-            monthly_borough_quantity_new[month][disease] , monthly_borough_costs_new[month][disease], monthly_borough_dosage_new[month][disease]  , monthly_borough_items_new[month][disease] = calculateTemporalMetrics_LSOA(opioids, old)
+            monthly_borough_quantity_new[month][disease] , monthly_borough_costs_new[month][disease], monthly_borough_dosage_new[month][disease]  , monthly_borough_items_new[month][disease] = calculateTemporalMetrics_LSOA(opioids, mappings_dir='./mappings/', old = old)
 
 
     print("Done computing LSOA level prescription prevalences, writing files")
 
 
-    writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new , conditions , output_dir, old)
+    writeResultFiles(monthly_borough_quantity_new ,monthly_borough_dosage_new , monthly_borough_costs_new , monthly_borough_items_new , conditions , output_dir,  mappings_dir='./mappings/' , isOld = old)
     print("Finished processing !!!!! ")
