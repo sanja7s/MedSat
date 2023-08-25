@@ -1,53 +1,55 @@
 ,BNF_code,Drug_name,Mapped_Condition
-146,0601023A0,Acarbose,diabetes
-164,0601023AS,Albiglutide,diabetes
-367,0601023AK,Alogliptin,diabetes
-170,0601023AJ,Alogliptin/Metformin,diabetes
-11,0607010B0,Bromocriptine,diabetes
-169,0601023AM,Canagliflozin,diabetes
-165,0601023AP,Canagliflozin/Metformin,diabetes
-306,0601021E0,Chlorpropamide,diabetes
-349,0212000AD,Colesevelam Hydrochloride,diabetes
-175,0601023AG,Dapagliflozin,diabetes
-168,0601023AL,Dapagliflozin/Metformin,diabetes
-143,0605020E0,Desmopressin Acetate,diabetes
-166,0601023AQ,Dulaglutide,diabetes
-167,0601023AN,Empagliflozin,diabetes
-163,0601023AR,Empagliflozin/Metformin,diabetes
-158,0601023AX,Ertugliflozin,diabetes
-250,0601023Y0,Exenatide,diabetes
-243,0601021H0,Glibenclamide,diabetes
-14,0601021M0,Gliclazide,diabetes
-256,0601021A0,Glimepiride,diabetes
-337,0601021P0,Glipizide,diabetes
-26,0601011A0,Insulin Aspart,diabetes
-99,0601012Z0,Insulin Degludec,diabetes
-274,0601012X0,Insulin Detemir,diabetes
-268,0601012V0,Insulin Glargine,diabetes
-300,0601012AB,Insulin Glargine/Lixisenatide,diabetes
-334,0601011P0,Insulin Glulisine,diabetes
-141,0601011R0,Insulin Human,diabetes
-297,0601011L0,Insulin Lispro,diabetes
-329,0601012S0,Isophane Insulin,diabetes
-177,0601023AE,Linagliptin,diabetes
-174,0601023AF,Linagliptin/Metformin,diabetes
-178,0601023AB,Liraglutide,diabetes
-173,0601023AI,Lixisenatide,diabetes
-35,0601022B0,Metformin Hydrochloride,diabetes
-135,0601023W0,Metformin Hydrochloride/Pioglitazone,diabetes
-25,0601023V0,Metformin Hydrochloride/Rosiglitazone,diabetes
-176,0601023AD,Metformin Hydrochloride/Sitagliptin,diabetes
-360,0601023Z0,Metformin Hydrochloride/Vildagliptin,diabetes
-69,0601023M0,Miglitol,diabetes
-299,0601023U0,Nateglinide,diabetes
-273,0601023B0,Pioglitazone Hydrochloride,diabetes
-88,0601023R0,Repaglinide,diabetes
-191,0601023S0,Rosiglitazone,diabetes
-179,0601023AC,Saxagliptin,diabetes
-160,0601023AV,Saxagliptin/Dapagliflozin,diabetes
-368,0601023AH,Saxagliptin/Metformin,diabetes
-161,0601023AW,Semaglutide,diabetes
-123,0601023X0,Sitagliptin,diabetes
-144,0601021V0,Tolazamide,diabetes
-64,0601021X0,Tolbutamide,diabetes
-180,0601023AA,Vildagliptin,diabetes
+28,0601023A0,Acarbose,diabetes
+39,0601023AS,Albiglutide,diabetes
+19,0601023AK,Alogliptin,diabetes
+5,0601023AJ,Alogliptin/Metformin,diabetes
+49,0607010B0,Bromocriptine,diabetes
+50,0601023AM,Canagliflozin,diabetes
+22,0601023AP,Canagliflozin/Metformin,diabetes
+37,0601021E0,Chlorpropamide,diabetes
+27,0212000AD,Colesevelam Hydrochloride,diabetes
+8,0601023AG,Dapagliflozin,diabetes
+31,0601023AL,Dapagliflozin/Metformin,diabetes
+34,0605020E0,Desmopressin Acetate,diabetes
+48,0601023AQ,Dulaglutide,diabetes
+38,0601023AN,Empagliflozin,diabetes
+33,0601023AR,Empagliflozin/Metformin,diabetes
+32,0601023AX,Ertugliflozin,diabetes
+3,0601023Y0,Exenatide,diabetes
+11,0601021H0,Glibenclamide,diabetes
+0,0601021M0,Gliclazide,diabetes
+44,0601021A0,Glimepiride,diabetes
+17,0601021P0,Glipizide,diabetes
+46,0202010L0,Hydrochlorothiazide,diabetes
+20,0202080M0,Hydrochlorothiazide/Potassium,diabetes
+6,0601011A0,Insulin Aspart,diabetes
+30,0601012Z0,Insulin Degludec,diabetes
+26,0601012X0,Insulin Detemir,diabetes
+16,0601012V0,Insulin Glargine,diabetes
+29,0601012AB,Insulin Glargine/Lixisenatide,diabetes
+13,0601011P0,Insulin Glulisine,diabetes
+21,0601011R0,Insulin Human,diabetes
+10,0601011L0,Insulin Lispro,diabetes
+25,0601012S0,Isophane Insulin,diabetes
+41,0601023AE,Linagliptin,diabetes
+7,0601023AF,Linagliptin/Metformin,diabetes
+52,0601023AB,Liraglutide,diabetes
+40,0601023AI,Lixisenatide,diabetes
+36,0601022B0,Metformin Hydrochloride,diabetes
+15,0601023W0,Metformin Hydrochloride/Pioglitazone,diabetes
+1,0601023V0,Metformin Hydrochloride/Rosiglitazone,diabetes
+45,0601023AD,Metformin Hydrochloride/Sitagliptin,diabetes
+18,0601023Z0,Metformin Hydrochloride/Vildagliptin,diabetes
+9,0601023M0,Miglitol,diabetes
+23,0601023U0,Nateglinide,diabetes
+4,0601023B0,Pioglitazone Hydrochloride,diabetes
+43,0601023R0,Repaglinide,diabetes
+53,0601023S0,Rosiglitazone,diabetes
+12,0601023AC,Saxagliptin,diabetes
+42,0601023AV,Saxagliptin/Dapagliflozin,diabetes
+51,0601023AH,Saxagliptin/Metformin,diabetes
+24,0601023AW,Semaglutide,diabetes
+2,0601023X0,Sitagliptin,diabetes
+14,0601021V0,Tolazamide,diabetes
+35,0601021X0,Tolbutamide,diabetes
+47,0601023AA,Vildagliptin,diabetes

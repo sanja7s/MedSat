@@ -1,15 +1,25 @@
 ,BNF_code,Drug_name,Mapped_Condition
-199,0401020A0,Alprazolam,anxiety
-330,0401020G0,Bromazepam,anxiety
-227,0401020V0,Clorazepate Dipotassium,anxiety
-80,0401020K0,Diazepam,anxiety
-101,0704020AA,Duloxetine Hydrochloride,anxiety
-238,0403030X0,Escitalopram,anxiety
-31,0408010G0,Gabapentin,anxiety
-139,0304010J0,Hydroxyzine Hydrochloride,anxiety
-57,0401020R0,Meprobamate,anxiety
-208,0403030P0,Paroxetine Hydrochloride,anxiety
-78,0406000T0,Prochlorperazine Maleate,anxiety
-257,0402010AB,Quetiapine,anxiety
-46,0402010X0,Trifluoperazine,anxiety
-204,0403040W0,Venlafaxine,anxiety
+104,0401020A0,Alprazolam,anxiety
+116,0403010B0,Amitriptyline Hydrochloride,anxiety
+118,0401020G0,Bromazepam,anxiety
+112,0401020B0,Buspirone Hydrochloride,anxiety
+111,0401020D0,Chlordiazepoxide,anxiety
+113,0401020E0,Chlordiazepoxide Hydrochloride,anxiety
+114,0403030D0,Citalopram Hydrobromide,anxiety
+123,0401020V0,Clorazepate Dipotassium,anxiety
+107,0401020K0,Diazepam,anxiety
+121,0704020AA,Duloxetine Hydrochloride,anxiety
+120,0403030X0,Escitalopram,anxiety
+119,0408010G0,Gabapentin,anxiety
+105,0304010J0,Hydroxyzine Hydrochloride,anxiety
+108,0401020P0,Lorazepam,anxiety
+109,0401020R0,Meprobamate,anxiety
+125,0403040X0,Mirtazapine,anxiety
+110,0401020T0,Oxazepam,anxiety
+106,0403030P0,Paroxetine Hydrochloride,anxiety
+117,0402010Q0,Perphenazine,anxiety
+127,0406000T0,Prochlorperazine Maleate,anxiety
+115,0204000R0,Propranolol Hydrochloride,anxiety
+122,0402010AB,Quetiapine,anxiety
+126,0402010X0,Trifluoperazine,anxiety
+124,0403040W0,Venlafaxine,anxiety

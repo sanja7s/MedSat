@@ -1,51 +1,51 @@
 ,BNF_code,Drug_name,Mapped_Condition
-18,0207030A0,Adrenaline,asthma
-223,0301030B0,Aminophylline,asthma
-61,0301030D0,Aminophylline With Antacid,asthma
-348,1502010W0,Articaine Hydrochloride & Adrenaline,asthma
-15,0302000C0,Beclometasone Dipropionate,asthma
-207,0304020AA,Benralizumab,asthma
-90,0603020B0,Betamethasone,asthma
-363,1201010E0,Betamethasone Sodium Phosphate,asthma
-262,0603020D0,Betamethasone Valerate,asthma
-117,1304000F0,Betamethasone Valerate,asthma
-34,1304000E0,Budesonide,asthma
-209,0105020A0,Budesonide,asthma
-45,0302000U0,Ciclesonide,asthma
-47,0603020F0,Cortisone Acetate,asthma
-89,1104010I0,Dexamethasone,asthma
-193,0603020AA,Dexamethasone Phosphate,asthma
-1,1304000K0,Dexamethasone Sodium Phosphate,asthma
-41,0603020H0,Dexamethasone Sodium Phosphate,asthma
-272,0309010Y0,Ephedrine HCl/Dextrometh Hydrob,asthma
-55,0309020AE,Ephedrine HCl/Ipecacuanha,asthma
-213,0301012F0,Ephedrine Hydrochloride,asthma
-157,0301040J0,Ephedrine Sulfate,asthma
-142,1202010L0,Flunisolide,asthma
-125,1202010W0,Fluticasone Furoate,asthma
-122,0301011E0,Formoterol Fumarate,asthma
-365,1304000V0,Hydrocortisone,asthma
-36,1304000W0,Hydrocortisone Butyrate,asthma
-145,0301020I0,Ipratropium Bromide,asthma
-374,1104020Y0,Ketotifen Fumarate,asthma
-7,0905013N0,Magnesium Sulfate,asthma
-239,0101010T0,Magnesium Sulphate,asthma
-328,0304020Y0,Mepolizumab,asthma
-71,1304000A0,Methyl Prednisolone Acetate,asthma
-37,0603020S0,Methylprednisolone,asthma
-112,1001022K0,Methylprednisolone Acetate,asthma
-366,1304000Y0,Mometasone Furoate,asthma
-87,0303020G0,Montelukast,asthma
-311,1202010Q0,Nedocromil Sodium,asthma
-49,0304020X0,Omalizumab,asthma
-369,0701030N0,Orciprenaline Sulfate,asthma
-134,0603020T0,Prednisolone,asthma
-359,1001022N0,Prednisolone Acetate,asthma
-220,0603020X0,Prednisone,asthma
-266,0304020Z0,Reslizumab,asthma
-344,0301011U0,Salmeterol,asthma
-201,1202010P0,Sodium Cromoglicate,asthma
-70,0301020Q0,Tiotropium,asthma
-210,0301040X0,Tiotropium Brom/Olodaterol,asthma
-21,0303020Z0,Zafirlukast,asthma
-342,0303020Y0,Zileuton,asthma
+65,0207030A0,Adrenaline,asthma
+77,0301030B0,Aminophylline,asthma
+100,0301030D0,Aminophylline With Antacid,asthma
+103,1502010W0,Articaine Hydrochloride & Adrenaline,asthma
+58,0302000C0,Beclometasone Dipropionate,asthma
+93,0304020AA,Benralizumab,asthma
+68,0603020B0,Betamethasone,asthma
+66,1201010E0,Betamethasone Sodium Phosphate,asthma
+67,0603020D0,Betamethasone Valerate,asthma
+98,1304000F0,Betamethasone Valerate,asthma
+96,1304000E0,Budesonide,asthma
+86,0105020A0,Budesonide,asthma
+62,0302000U0,Ciclesonide,asthma
+88,0603020F0,Cortisone Acetate,asthma
+56,1104010I0,Dexamethasone,asthma
+76,0603020AA,Dexamethasone Phosphate,asthma
+101,1304000K0,Dexamethasone Sodium Phosphate,asthma
+82,0603020H0,Dexamethasone Sodium Phosphate,asthma
+90,0309010Y0,Ephedrine HCl/Dextrometh Hydrob,asthma
+74,0309020AE,Ephedrine HCl/Ipecacuanha,asthma
+92,0301012F0,Ephedrine Hydrochloride,asthma
+59,0301040J0,Ephedrine Sulfate,asthma
+89,1202010L0,Flunisolide,asthma
+83,1202010W0,Fluticasone Furoate,asthma
+75,0301011E0,Formoterol Fumarate,asthma
+80,1304000V0,Hydrocortisone,asthma
+102,1304000W0,Hydrocortisone Butyrate,asthma
+69,0301020I0,Ipratropium Bromide,asthma
+54,1104020Y0,Ketotifen Fumarate,asthma
+61,0905013N0,Magnesium Sulfate,asthma
+60,0101010T0,Magnesium Sulphate,asthma
+95,0304020Y0,Mepolizumab,asthma
+97,1304000A0,Methyl Prednisolone Acetate,asthma
+57,0603020S0,Methylprednisolone,asthma
+70,1001022K0,Methylprednisolone Acetate,asthma
+78,1304000Y0,Mometasone Furoate,asthma
+85,0303020G0,Montelukast,asthma
+81,1202010Q0,Nedocromil Sodium,asthma
+55,0304020X0,Omalizumab,asthma
+87,0701030N0,Orciprenaline Sulfate,asthma
+63,0603020T0,Prednisolone,asthma
+64,1001022N0,Prednisolone Acetate,asthma
+84,0603020X0,Prednisone,asthma
+94,0304020Z0,Reslizumab,asthma
+91,0301011U0,Salmeterol,asthma
+71,1202010P0,Sodium Cromoglicate,asthma
+73,0301020Q0,Tiotropium,asthma
+99,0301040X0,Tiotropium Brom/Olodaterol,asthma
+79,0303020Z0,Zafirlukast,asthma
+72,0303020Y0,Zileuton,asthma
