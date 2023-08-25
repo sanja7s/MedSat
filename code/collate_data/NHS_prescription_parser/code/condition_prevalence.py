@@ -54,9 +54,11 @@ if __name__ == '__main__':
         print(f)
 
     
-    matcher = DrugMatcher(mappings_dir = './mappings/')
+    matcher = DrugMatcher(mappings_dir = './mappings/' , output_dir=output_dir)
 
     DiseaseDrugs, drugMap = matcher.DrugMatching(conditions)
+
+    matcher.dumpDrugs(DiseaseDrugs)
     
     print(DiseaseDrugs)
     
