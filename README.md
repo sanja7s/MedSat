@@ -68,4 +68,5 @@ The dataset is released under the CC BY-SA 4.0 license.
 #### Example __MEDSAT__  image features
 ![example __MEDSAT__  image features](figures/composite_data_vis.jpg)
 
-
+#### Example __MEDSAT__  LSOA image features
+![example __MEDSAT__  image features](figures/example_LSOAs_composite.jpg)
