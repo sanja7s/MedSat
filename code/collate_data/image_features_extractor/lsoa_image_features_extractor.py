@@ -103,6 +103,5 @@ if __name__ == '__main__':
 
     lsoa_shapefile_root_dir = "../../../data/auxiliary_data/lsoas_2021/LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC)"
     image_dir = "../../../data/image_data/England_JJA2020"
-    # lsoas_to_visualize = ["E01014370"]
-    lsoas_to_visualize = None
+    lsoas_to_visualize = ["E01004798", "E01005478", "E01005779", "E01008986", "E01009047", "E01008948"]
     extract_lsoa_image_features(lsoa_shapefile_root_dir, image_dir, lsoas_to_visualize)
