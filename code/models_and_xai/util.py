@@ -50,7 +50,16 @@ e_variable_mapping = {
     "Permanent water bodies": "Permanent water bodies",
     "Herbaceous wetland": "Herbaceous wetland",
     "Mangroves": "Mangroves",
-    "Moss and lichen": "Moss and lichen"
+    "Moss and lichen": "Moss and lichen",
+    "water": "water",
+    "trees": "trees",
+    "grass": "grass",
+    "flooded_vegetation": "flooded_vegetation",
+    "crops": "crops",
+    "shrub_and_scrub": "shrub_and_scrub",
+    "built": "built",
+    "bare": "bare",
+    "snow_and_ice": "snow_and_ice"
 }
 e_variable_mapping = {'e_'+k:v for (k,v) in e_variable_mapping.items()}
 
@@ -133,8 +142,10 @@ soc_variable_mapping = {
 
 variable_mapping = {**e_variable_mapping, **soc_variable_mapping}
 
-land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland", "e_Built-up", "e_Bare sparse vegetation",
-                      "e_Permanent water bodies", "e_Herbaceous wetland", "e_Moss and lichen"]
+# land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland", "e_Built-up", "e_Bare sparse vegetation",
+#                       "e_Permanent water bodies", "e_Herbaceous wetland", "e_Moss and lichen"]
+
+land_cover_columns = ["e_water", "e_trees", "e_grass",  "e_flooded_vegetation", "e_crops", "e_shrub_and_scrub", "e_built", "e_bare", "e_snow_and_ice"]
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
