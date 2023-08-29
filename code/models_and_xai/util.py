@@ -11,7 +11,7 @@ e_variable_mapping = {
     "ozone": "ozone",
     "total_aerosol_optical_depth_at_550nm_surface": "aerosols",
     "particulate_matter_d_less_than_25_um_surface": "PM2.5",
-    "ndvi": "greenery",
+    "ndvi": "ndvi",
     "leaf_area_index_high_vegetation": "high vegetation LAI",
     "leaf_area_index_low_vegetation": "low vegetation LAI",
     "temperature_2m": "temperature",
@@ -128,13 +128,10 @@ soc_variable_mapping = {
     "c_percent Aged 75 to 79 years": "75 to 79 years",
     "c_percent Aged 80 to 84 years": "80 to 84 years",
     "c_percent Aged 85 years and over": "85 years and over"
-
 }
+geo_mapping = {"centroid_x": "latitude", "centroid_y": "longitude"}
 
-variable_mapping = {**e_variable_mapping, **soc_variable_mapping}
-
-land_cover_columns = ["e_Tree cover", "e_Shrubland", "e_Grassland", "e_Cropland", "e_Built-up", "e_Bare sparse vegetation",
-                      "e_Permanent water bodies", "e_Herbaceous wetland", "e_Moss and lichen"]
+variable_mapping = {**e_variable_mapping, **soc_variable_mapping, **geo_mapping}
 
 all_conditions = ['diabetes', 'hypertension', 'opioids', 'depression', 'anxiety', 'asthma', 'total']
 
@@ -149,6 +146,16 @@ age_columns = ["4 years and under", "5 to 9 years", "10 to 14 years", "15 to 19 
 gender_columns = ["male"]
 
 geo_columns = ["centroid_x","centroid_y"]
+
+filtered_columns = geo_columns + \
+                                  ["e_NO2", "e_ozone", "e_particulate_matter_d_less_than_25_um_surface", "e_ndvi", "e_leaf_area_index_high_vegetation", "e_leaf_area_index_low_vegetation", "e_temperature_2m", "e_total_precipitation_sum", "e_water", "e_trees", "e_grass"] + \
+               ["c_percent asian", "c_percent black", "c_percent mixed", "c_percent occupancy rating bedrooms +2", "c_percent occupancy rating rooms 0",
+                "c_percent 2. Professional occupations", "c_percent less than 2 years", "c_pop_density", "c_total population",
+                "c_percent very good health", "c_percent bad health", "c_percent highly-deprived", "c_percent male", "c_net annual income",
+                "c_percent Aged 15 to 19 years", "c_percent Aged 20 to 24 years", "c_percent Aged 25 to 29 years", "c_percent Aged 30 to 34 years",
+                "c_percent Aged 35 to 39 years", "c_percent Aged 40 to 44 years", "c_percent Aged 45 to 49 years", "c_percent Aged 50 to 54 years", "c_percent Aged 55 to 59 years",
+                "c_percent Aged 60 to 64 years", "c_percent Aged 65 to 69 years"]
+
 
 regex_per_modality = {
     "sociodemographic": '^(c_)',
@@ -183,7 +190,7 @@ def split_dataset(year, ratio_test=0.3):
     return dataset_train, dataset_val, dataset_test
 
 
-def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=False):
+def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_keep=None, log_normalize=False, agg_age_columns=False):
     labels = np.array(dataset[outcome_col])
     if log_normalize and outcome_col in ["o_opioids_quantity_per_capita", "o_total_quantity_per_capita"]:
         labels = np.log(labels)
@@ -197,7 +204,19 @@ def extract_features_and_labels(dataset, outcome_col, modalities, log_normalize=
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
+    if columns_to_keep is not None:
+        modalities_features = modalities_features.filter(columns_to_keep)
+
     modalities_features.rename(columns=variable_mapping, inplace=True)
+
+    if agg_age_columns:
+        modalities_features["15 to 24 years"] = modalities_features["15 to 19 years"] + modalities_features["20 to 24 years"]
+        modalities_features["25 to 34 years"] = modalities_features["25 to 29 years"] + modalities_features["30 to 34 years"]
+        modalities_features["35 to 49 years"] = modalities_features["35 to 39 years"] + modalities_features["40 to 44 years"] + modalities_features["45 to 49 years"]
+        modalities_features["50 to 59 years"] = modalities_features["50 to 54 years"] + modalities_features["55 to 59 years"]
+        modalities_features["60 to 69 years"] = modalities_features["60 to 64 years"] + modalities_features["65 to 69 years"]
+        #remove the old age columns after the aggregation
+        modalities_features = modalities_features.filter(age_columns)
 
     return modalities_features, labels
 
@@ -205,14 +224,15 @@ def merge_with_image_features(dataset):
     if os.path.exists(image_features_folder):
         for season in os.listdir(image_features_folder):
             image_features_season = os.path.join(image_features_folder, season)
-            image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
-            image_features = image_features.filter(regex="^(mean)|(std)")
-            image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
-            print (image_features)
-            image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-            print (image_features.columns)
-            # dataset = dataset.merge(image_features, left_index=True, right_index=True)
-            dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
+            if os.path.isdir(image_features_season):
+                image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
+                image_features = image_features.filter(regex="^(mean)|(std)")
+                image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
+                print (image_features)
+                image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
+                print (image_features.columns)
+                # dataset = dataset.merge(image_features, left_index=True, right_index=True)
+                dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
 def read_spatial_dataset(year):

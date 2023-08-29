@@ -74,7 +74,7 @@ def visualize_dependence_plot(shap_values, x_test, condition):
     # if condition == "diabetes":
     #     width = 3.3
     fig = plt.figure()
-    shap.dependence_plot("PM2.5", shap_values.values, x_test, show=False)
+    shap.dependence_plot("rank(0)", shap_values.values, x_test, show=False)
     plt.gcf().set_size_inches(width, 4)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
@@ -91,8 +91,8 @@ def visualize_shap_values(shap_explainer, condition):
     # if condition == "diabetes":
     #     width = 3.3
     fig = plt.figure()
-    shap.summary_plot(shap_explainer, show=False, max_display=10, color_bar=False, cmap="plasma")
-    plt.gcf().set_size_inches(width, 3.7)
+    shap.summary_plot(shap_explainer, show=False, max_display=20, color_bar=False, cmap="plasma")
+    plt.gcf().set_size_inches(width, 4.5)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
     # if condition != "diabetes":
@@ -128,7 +128,7 @@ def compute_feature_rank(condition, feature_name="population density"):
 if __name__ == '__main__':
 
     target_year = 2020
-    target_modalities = ["image", "sociodemographic", "environmental"]
+    target_modalities = ["geo", "sociodemographic", "environmental"]
     shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year), "_".join(target_modalities))
     if not os.path.exists(shap_results_base_dir):
         os.makedirs(shap_results_base_dir)
@@ -146,10 +146,11 @@ if __name__ == '__main__':
     for i, condition in enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
-        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities)
-        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities)
-        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities)
+        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
+        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
+        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
 
+        print(x_train.columns)
         #normalize data
         scaler = StandardScaler()
         x_train_norm = scaler.fit_transform(x_train)
@@ -165,8 +166,6 @@ if __name__ == '__main__':
         predictions_results["DIFF"] = (predictions_results["ACTUAL"] - predictions_results["PREDICTED"]).pow(2)
         predictions_results.sort_values(by="DIFF",inplace=True)
         predictions_results.to_csv(os.path.join(shap_results_base_dir, "test_predictions_{}.csv".format(condition)))
-
-
 
         # Compute SHAP values for test set
         #SHAPLEY value interpretation:
