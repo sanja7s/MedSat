@@ -1,7 +1,7 @@
 import networkx as nx
 import pandas as pd
 from tqdm import tqdm
-from utils.utils import findDrugsForDisease , findDrugsForCategory
+from matching.utils import findDrugsForDisease , findDrugsForCategory
 
 class diseaseMatcher:
     def __init__(self , mappings_dir="../mappings/"):
