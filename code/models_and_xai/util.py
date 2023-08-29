@@ -47,7 +47,7 @@ e_variable_mapping = {
     "Built-up": "Built-up",
     "Bare / sparse vegetation": "Bare / sparse vegetation",
     "Snow and ice": "Snow and ice",
-    "Permanent water bodies": "Permanent water bodies",
+    "Permanent water bodies": "Water bodies",
     "Herbaceous wetland": "Herbaceous wetland",
     "Mangroves": "Mangroves",
     "Moss and lichen": "Moss and lichen"
@@ -148,8 +148,8 @@ gender_columns = ["male"]
 geo_columns = ["centroid_x","centroid_y"]
 
 filtered_columns = geo_columns + \
-                                  ["e_NO2", "e_ozone", "e_particulate_matter_d_less_than_25_um_surface", "e_ndvi", "e_leaf_area_index_high_vegetation", "e_leaf_area_index_low_vegetation", "e_temperature_2m", "e_total_precipitation_sum", "e_water", "e_trees", "e_grass"] + \
-               ["c_percent asian", "c_percent black", "c_percent mixed", "c_percent occupancy rating bedrooms +2", "c_percent occupancy rating rooms 0",
+                                  ["e_NO2", "e_ozone", "e_particulate_matter_d_less_than_25_um_surface", "e_ndvi", "e_leaf_area_index_high_vegetation", "e_leaf_area_index_low_vegetation", "e_temperature_2m", "e_total_precipitation_sum", "e_Permanent water bodies", "e_Tree cover", "e_Grassland"] + \
+               ["c_percent asian", "c_percent black", "c_percent mixed", "c_percent occupancy rating rooms +2", "c_percent occupancy rating rooms 0",
                 "c_percent 2. Professional occupations", "c_percent less than 2 years", "c_pop_density", "c_total population",
                 "c_percent very good health", "c_percent bad health", "c_percent highly-deprived", "c_percent male", "c_net annual income",
                 "c_percent Aged 15 to 19 years", "c_percent Aged 20 to 24 years", "c_percent Aged 25 to 29 years", "c_percent Aged 30 to 34 years",
