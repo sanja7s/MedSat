@@ -92,16 +92,16 @@ def findDrugsForDisease(Graph, Disease, BNF_Chem ):#,threshProb):
         if (cleanStringofUTF(e[1]).lower().find(Disease.lower()) >=0) or (cleanStringofUTF(e[0]).lower().find(Disease.lower()) >= 0) :
             drugNode = ''
             matchedDisease = ''
-            if Graph.node[e[0]]['type'] == 'symptom':
+            if Graph.nodes[e[0]]['type'] == 'symptom':
                 drugNode = e[1]
                 matchedDisease = e[0]
             else:
                 drugNode = e[0]
                 matchedDisease = e[1]
-            drugs[Graph.node[drugNode]['Id']] = {}
-            drugs[Graph.node[drugNode]['Id']]['name'] = drugNode
-            drugs[Graph.node[drugNode]['Id']]['matched_disease'] = matchedDisease
-            drugs[Graph.node[drugNode]['Id']]['disease'] = Disease
+            drugs[Graph.nodes[drugNode]['Id']] = {}
+            drugs[Graph.nodes[drugNode]['Id']]['name'] = drugNode
+            drugs[Graph.nodes[drugNode]['Id']]['matched_disease'] = matchedDisease
+            drugs[Graph.nodes[drugNode]['Id']]['disease'] = Disease
     enrichdrugs(chem_dict,drugs)
     return drugs
 
@@ -139,17 +139,17 @@ def findDrugsForCategory(Graph, Cat, BNF_Chem ):#,threshProb):
         if (cleanStringofUTF(e[1]).lower().find(Cat.lower()) >=0) or (cleanStringofUTF(e[0]).lower().find(Cat.lower()) >= 0) :
             drugNode = ''
             matchedDisease = ''
-            if Graph.node[e[0]]['type'] == 'category':
+            if Graph.nodes[e[0]]['type'] == 'category':
                 drugNode = e[1]
                 matchedDisease = e[0]
             else:
                 drugNode = e[0]
                 matchedDisease = e[1]
 #             print Graph.node[drugNode]['Id']
-            drugs[Graph.node[drugNode]['Id']] = {}
-            drugs[Graph.node[drugNode]['Id']]['name'] = drugNode
-            drugs[Graph.node[drugNode]['Id']]['matched_cat'] = matchedDisease
-            drugs[Graph.node[drugNode]['Id']]['category'] = Cat
+            drugs[Graph.nodes[drugNode]['Id']] = {}
+            drugs[Graph.nodes[drugNode]['Id']]['name'] = drugNode
+            drugs[Graph.nodes[drugNode]['Id']]['matched_cat'] = matchedDisease
+            drugs[Graph.nodes[drugNode]['Id']]['category'] = Cat
     enrichdrugs(chem_dict,drugs)
     return drugs
 
