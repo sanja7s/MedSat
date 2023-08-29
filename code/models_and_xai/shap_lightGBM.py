@@ -150,7 +150,6 @@ if __name__ == '__main__':
         x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
         x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
 
-        print(x_train.columns)
         #normalize data
         scaler = StandardScaler()
         x_train_norm = scaler.fit_transform(x_train)
