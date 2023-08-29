@@ -93,7 +93,6 @@ def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, mo
         else:
             fold_splits = get_dataset_spatial_fold_splits(sdataset, year=year, fold_iterration=i)
 
-        print (fold_splits)
         cross_val_result = model_fn(fold_splits, modalities)
         if folds_test_scores is None:
             folds_test_scores = cross_val_result
