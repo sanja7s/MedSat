@@ -101,7 +101,7 @@ soc_variable_mapping = {
     "c_percent born in the UK": "born in the UK",
     "c_percent 10 years or more": "UK resident 10+ years",
     "c_percent 2 years or more but less than 5 years": "reside in the UK between 2 years and 5 years",
-    "c_percent less than 2 years": "reside in the UK for less than 2 years",
+    "c_percent less than 2 years": "reside in UK for less than 2 years",
     "c_pop_density": "population density",
     "c_percent children up to 14": "children up to 14",
     "c_percent aged 65plus": "aged 65plus",
@@ -165,13 +165,16 @@ gender_columns = ["male"]
 geo_columns = ["centroid_x","centroid_y"]
 
 filtered_columns = geo_columns + \
-                                  ["e_NO2", "e_ozone", "e_particulate_matter_d_less_than_25_um_surface", "e_ndvi", "e_leaf_area_index_high_vegetation", "e_leaf_area_index_low_vegetation", "e_temperature_2m", "e_total_precipitation_sum", "e_Permanent water bodies", "e_Tree cover", "e_Grassland"] + \
-               ["c_percent asian", "c_percent black", "c_percent mixed", "c_percent occupancy rating rooms +2", "c_percent occupancy rating rooms 0",
+                ["e_NO2", "e_ozone", "e_particulate_matter_d_less_than_25_um_surface", "e_ndvi", "e_leaf_area_index_high_vegetation", 
+                 "e_leaf_area_index_low_vegetation", "e_temperature_2m", "e_total_precipitation_sum", "e_water", "e_trees", "e_grass"] + \
+               ["c_percent asian", "c_percent black", "c_percent mixed", "c_percent occupancy rating rooms -2", "c_percent occupancy rating rooms +2",
                 "c_percent 2. Professional occupations", "c_percent less than 2 years", "c_pop_density", "c_total population",
                 "c_percent very good health", "c_percent bad health", "c_percent highly-deprived", "c_percent male", "c_net annual income",
+                "c_percent Aged 4 years and under", "c_percent Aged 5 to 9 years", "c_percent Aged 10 to 14 years",
                 "c_percent Aged 15 to 19 years", "c_percent Aged 20 to 24 years", "c_percent Aged 25 to 29 years", "c_percent Aged 30 to 34 years",
-                "c_percent Aged 35 to 39 years", "c_percent Aged 40 to 44 years", "c_percent Aged 45 to 49 years", "c_percent Aged 50 to 54 years", "c_percent Aged 55 to 59 years",
-                "c_percent Aged 60 to 64 years", "c_percent Aged 65 to 69 years"]
+                "c_percent Aged 35 to 39 years", "c_percent Aged 40 to 44 years", "c_percent Aged 45 to 49 years", "c_percent Aged 50 to 54 years",
+                "c_percent Aged 55 to 59 years", "c_percent Aged 60 to 64 years", "c_percent Aged 65 to 69 years",
+                "c_percent Aged 70 to 74 years", "c_percent Aged 75 to 79 years", "c_percent Aged 80 to 84 years", "c_percent Aged 85 years and over"]
 
 
 regex_per_modality = {
@@ -233,7 +236,8 @@ def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_kee
         modalities_features["50 to 59 years"] = modalities_features["50 to 54 years"] + modalities_features["55 to 59 years"]
         modalities_features["60 to 69 years"] = modalities_features["60 to 64 years"] + modalities_features["65 to 69 years"]
         #remove the old age columns after the aggregation
-        modalities_features = modalities_features.filter(age_columns)
+        print (modalities_features.head())
+        modalities_features = modalities_features.drop(columns=age_columns)
 
     return modalities_features, labels
 
@@ -245,9 +249,9 @@ def merge_with_image_features(dataset):
                 image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
                 image_features = image_features.filter(regex="^(mean)|(std)")
                 image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
-                print (image_features)
+                # print (image_features)
                 image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-                print (image_features.columns)
+                # print (image_features.columns)
                 # dataset = dataset.merge(image_features, left_index=True, right_index=True)
                 dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset

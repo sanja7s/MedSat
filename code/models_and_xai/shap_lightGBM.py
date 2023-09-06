@@ -8,7 +8,8 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import ShuffleSplit
-from sklearn.metrics import r2_score
+from sklearn.metrics import r2_score, mean_squared_error
+from math import sqrt
 import lightgbm as lgb
 import shap
 import pickle
@@ -114,7 +115,7 @@ def visualize_shap_values(shap_explainer, condition):
     plt.close()
 
 
-def compute_feature_rank(condition, feature_name="population density"):
+def compute_feature_rank(condition, feature_name="population density", results_dir=""):
     total_feature_importances = np.abs(shap_values_test_df).mean(0)
     feature_importance = pd.DataFrame(list(zip(shap_values_test_df.columns, total_feature_importances)),
                                       columns=['col_name', 'feature_importance_vals'])
@@ -123,6 +124,8 @@ def compute_feature_rank(condition, feature_name="population density"):
     feature_rank_index = feature_importance.index[feature_importance['col_name'] == feature_name]
 
     print(condition, feature_name, feature_rank_index)
+
+    feature_importance.to_csv(os.path.join(results_dir, "feature_importance_{}.csv".format(condition)))
 
 
 if __name__ == '__main__':
@@ -143,12 +146,12 @@ if __name__ == '__main__':
     shap_values_per_condition=[]
     test_features_per_condition = []
     test_labels_per_condition = []
-    for i, condition in enumerate(all_conditions):
+    for i, condition in enumerate(["depression"]):  # enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
-        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
-        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
-        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=False)
+        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
+        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
+        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
 
         #normalize data
         scaler = StandardScaler()
@@ -158,9 +161,15 @@ if __name__ == '__main__':
 
         model = train_LGB(x_train_norm, y_train, x_val_norm, y_val)
         predictions = model.predict(x_test_norm)
-        test_r2 = r2_score(y_test, predictions)
 
+        # Calculating R2
+        test_r2 = r2_score(y_test, predictions)
         print('Test R^2: {} for condition {}'.format(test_r2, med_condition))
+
+        # Calculating RMSE
+        test_rmse = sqrt(mean_squared_error(y_test, predictions))
+        print('Test RMSE: {} for condition {}'.format(test_rmse, med_condition))
+
         predictions_results = pd.DataFrame({"ACTUAL": y_test, "PREDICTED": predictions}, index=x_test.index)
         predictions_results["DIFF"] = (predictions_results["ACTUAL"] - predictions_results["PREDICTED"]).pow(2)
         predictions_results.sort_values(by="DIFF",inplace=True)
@@ -192,5 +201,5 @@ if __name__ == '__main__':
         #     plot_individual_LSOAs("E01014782", train_data, shap_values_train, condition)
 
         visualize_shap_values(shap_values_test, condition)
-        compute_feature_rank(condition)
+        compute_feature_rank(condition, results_dir=shap_results_base_dir)
         compute_feature_rank(condition, feature_name="total population")
