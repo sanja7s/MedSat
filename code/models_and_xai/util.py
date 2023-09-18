@@ -256,10 +256,21 @@ def merge_with_image_features(dataset):
                 dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
-def read_spatial_dataset(year):
+def read_spatial_dataset(year, regions=False):
     sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
+    sdataset.reset_index(inplace=True)
+    # print (sdataset.head())
+    # print (list(sdataset.columns))
+    print (f"LEN OF DATA {len(sdataset)}")
     sdataset.set_index('geography code', inplace=True)
-    sdataset = merge_with_image_features(sdataset)
+    # sdataset = merge_with_image_features(sdataset)
+
+    if regions:
+        region_mapping = pd.read_csv(f"{auxiliary_data_folder}/lsoas_regions_mapping.csv")
+        region_mapping = region_mapping[["LSOA21CD","RGN22NM"]]\
+            .rename(columns={"LSOA21CD":"geography code", "RGN22NM":"region"}).set_index("geography code")
+        
+        sdataset = sdataset.join(region_mapping)
 
     return sdataset
 
