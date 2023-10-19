@@ -259,8 +259,6 @@ def merge_with_image_features(dataset):
 def read_spatial_dataset(year, regions=False, leave_in_region=None, leave_out_region=None, use_image_features=False):
     sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
     sdataset.reset_index(inplace=True)
-    # print (sdataset.head())
-    # print (list(sdataset.columns))
     print (f"LEN OF DATA {len(sdataset)}")
     sdataset.set_index('geography code', inplace=True)
 
