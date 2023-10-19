@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
 from util import *
-from repeated_cross_val import get_dataset_spatial_fold_splits
+from repeated_cross_val import get_dataset_spatial_fold_splits, get_dataset_fold_splits
 from lightGBM import train_LGB
 
 
@@ -70,7 +70,7 @@ def plot_individual_LSOAs(lsoa_id, dataset, shap_values, condition):
     plt.tight_layout()
     plt.show()
 
-def visualize_dependence_plot(shap_values, x_test, condition):
+def visualize_dependence_plot(shap_values, x_test, shap_results_base_dir, condition):
     width = 6.5
     # if condition == "diabetes":
     #     width = 3.3
@@ -87,7 +87,7 @@ def visualize_dependence_plot(shap_values, x_test, condition):
 
 
 #latex article class has witdh of 397.484pt
-def visualize_shap_values(shap_explainer, condition):
+def visualize_shap_values(shap_explainer, shap_results_base_dir, condition):
     width = 4
     # if condition == "diabetes":
     #     width = 3.3
@@ -115,7 +115,7 @@ def visualize_shap_values(shap_explainer, condition):
     plt.close()
 
 
-def compute_feature_rank(condition, feature_name="population density", results_dir=""):
+def compute_feature_rank(shap_values_test_df, condition, feature_name="population density", results_dir=""):
     total_feature_importances = np.abs(shap_values_test_df).mean(0)
     feature_importance = pd.DataFrame(list(zip(shap_values_test_df.columns, total_feature_importances)),
                                       columns=['col_name', 'feature_importance_vals'])
@@ -127,33 +127,40 @@ def compute_feature_rank(condition, feature_name="population density", results_d
 
     feature_importance.to_csv(os.path.join(results_dir, "feature_importance_{}.csv".format(condition)))
 
-
-if __name__ == '__main__':
-
-    target_year = 2020
-    target_modalities = ["geo", "sociodemographic", "environmental"]
-    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year), "_".join(target_modalities))
+def compute_shap_values(target_year, target_modalities, leave_in_region=None, leave_out_region=None):
+    regions_filtering = leave_out_region or leave_in_region
+    region_split = None
+    if leave_out_region != None:
+        region_split = f"except_{leave_out_region}_"
+    if leave_in_region != None:
+        region_split = f"{leave_in_region}_"
+    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year),
+                                         "_".join(target_modalities))
+    if region_split is not None:
+        shap_results_base_dir = "{}_{}".format(shap_results_base_dir, region_split)
     if not os.path.exists(shap_results_base_dir):
         os.makedirs(shap_results_base_dir)
 
-    fold_splits = get_dataset_spatial_fold_splits(read_spatial_dataset(target_year), target_year, 1)
+    dataset = read_spatial_dataset(target_year, regions_filtering, leave_in_region, leave_out_region)
+    # fold_splits = get_dataset_spatial_fold_splits(read_spatial_dataset(target_year), target_year, 1)
+    fold_splits = get_dataset_fold_splits(dataset)
     fold_split = fold_splits[0]
 
     train_data = fold_split[0]
     val_data = fold_split[1]
     test_data = fold_split[2]
 
-    shap_values_per_condition=[]
-    test_features_per_condition = []
-    test_labels_per_condition = []
     for i, condition in enumerate(["depression"]):  # enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
-        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
-        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
-        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities, columns_to_keep=filtered_columns, agg_age_columns=True)
+        x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities,
+                                                       columns_to_keep=filtered_columns, agg_age_columns=True)
+        x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities,
+                                                   columns_to_keep=filtered_columns, agg_age_columns=True)
+        x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities,
+                                                     columns_to_keep=filtered_columns, agg_age_columns=True)
 
-        #normalize data
+        # normalize data
         scaler = StandardScaler()
         x_train_norm = scaler.fit_transform(x_train)
         x_val_norm = scaler.transform(x_val)
@@ -172,13 +179,13 @@ if __name__ == '__main__':
 
         predictions_results = pd.DataFrame({"ACTUAL": y_test, "PREDICTED": predictions}, index=x_test.index)
         predictions_results["DIFF"] = (predictions_results["ACTUAL"] - predictions_results["PREDICTED"]).pow(2)
-        predictions_results.sort_values(by="DIFF",inplace=True)
+        predictions_results.sort_values(by="DIFF", inplace=True)
         predictions_results.to_csv(os.path.join(shap_results_base_dir, "test_predictions_{}.csv".format(condition)))
 
         # Compute SHAP values for test set
-        #SHAPLEY value interpretation:
+        # SHAPLEY value interpretation:
         print("Initializing SHAP explainer for: {}".format(med_condition))
-        explainer = shap.TreeExplainer(model,feature_names=x_train.columns)
+        explainer = shap.TreeExplainer(model, feature_names=x_train.columns)
 
         print("Computing SHAP values")
         shap_values_train = explainer(x_train_norm)
@@ -186,7 +193,7 @@ if __name__ == '__main__':
         shap_values_test = explainer(x_test_norm)
 
         print("Computing SHAP dependence plot")
-        visualize_dependence_plot(shap_values_test, x_test, condition)
+        visualize_dependence_plot(shap_values_test, x_test, shap_results_base_dir, condition)
 
         shap_values_train_df = pd.DataFrame(shap_values_train.values, columns=x_train.columns, index=x_train.index)
         shap_values_val_df = pd.DataFrame(shap_values_val.values, columns=x_val.columns, index=x_val.index)
@@ -200,6 +207,15 @@ if __name__ == '__main__':
         #     plot_individual_LSOAs("E01023500", val_data, shap_values_val, condition)
         #     plot_individual_LSOAs("E01014782", train_data, shap_values_train, condition)
 
-        visualize_shap_values(shap_values_test, condition)
-        compute_feature_rank(condition, results_dir=shap_results_base_dir)
-        compute_feature_rank(condition, feature_name="total population")
+        visualize_shap_values(shap_values_test,shap_results_base_dir, condition)
+        compute_feature_rank(shap_values_test_df, condition, results_dir=shap_results_base_dir)
+
+
+if __name__ == '__main__':
+
+    target_year = 2020
+    target_modalities = ["sociodemographic", "environmental"]
+    #compute_shap_values(target_year, target_modalities)
+    #compute_shap_values(target_year, target_modalities, leave_in_region="London")
+    compute_shap_values(target_year, target_modalities, leave_out_region="London")
+
