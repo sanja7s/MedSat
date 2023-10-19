@@ -127,7 +127,7 @@ def compute_feature_rank(shap_values_test_df, condition, feature_name="populatio
 
     feature_importance.to_csv(os.path.join(results_dir, "feature_importance_{}.csv".format(condition)))
 
-def compute_shap_values(target_year, target_modalities, leave_in_region=None, leave_out_region=None):
+def compute_shap_values(target_year, target_modalities, split="spatial", leave_in_region=None, leave_out_region=None):
     regions_filtering = leave_out_region or leave_in_region
     region_split = None
     if leave_out_region != None:
@@ -141,16 +141,25 @@ def compute_shap_values(target_year, target_modalities, leave_in_region=None, le
     if not os.path.exists(shap_results_base_dir):
         os.makedirs(shap_results_base_dir)
 
+    if split == "spatial":
+        print("Disabling leave_in_region and leave_out_region for the spatial fold split")
+        leave_in_region = None
+        leave_out_region = None
+
     dataset = read_spatial_dataset(target_year, regions_filtering, leave_in_region, leave_out_region)
-    # fold_splits = get_dataset_spatial_fold_splits(read_spatial_dataset(target_year), target_year, 1)
-    fold_splits = get_dataset_fold_splits(dataset)
+
+    if split == "spatial":
+        fold_splits = get_dataset_spatial_fold_splits(dataset, target_year, 1)
+    else:
+        fold_splits = get_dataset_fold_splits(dataset)
+
     fold_split = fold_splits[0]
 
     train_data = fold_split[0]
     val_data = fold_split[1]
     test_data = fold_split[2]
 
-    for i, condition in enumerate(["depression"]):  # enumerate(all_conditions):
+    for i, condition in enumerate(all_conditions):  # enumerate(all_conditions):
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
         x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities,
@@ -216,6 +225,6 @@ if __name__ == '__main__':
     target_year = 2020
     target_modalities = ["sociodemographic", "environmental"]
     #compute_shap_values(target_year, target_modalities)
-    #compute_shap_values(target_year, target_modalities, leave_in_region="London")
+    compute_shap_values(target_year, target_modalities, leave_in_region="London")
     compute_shap_values(target_year, target_modalities, leave_out_region="London")
 
