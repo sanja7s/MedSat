@@ -285,6 +285,15 @@ def standardize_data(dataset):
         
     return dataset
 
+def get_region_label(leave_in_region, leave_out_region):
+    region_split = ""
+    if leave_out_region != None:
+        region_split = f"except_{leave_out_region}_"
+    if leave_in_region != None:
+        region_split = f"{leave_in_region}_"
+
+    return region_split
+
 if __name__ == '__main__':
     split_dataset(2019)
 

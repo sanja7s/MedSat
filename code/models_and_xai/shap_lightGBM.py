@@ -128,11 +128,7 @@ def compute_feature_rank(shap_values_test_df, condition, feature_name="populatio
     feature_importance.to_csv(os.path.join(results_dir, "feature_importance_{}.csv".format(condition)))
 
 def compute_shap_values(target_year, target_modalities, split="spatial", leave_in_region=None, leave_out_region=None):
-    region_split = None
-    if leave_out_region != None:
-        region_split = f"except_{leave_out_region}_"
-    if leave_in_region != None:
-        region_split = f"{leave_in_region}_"
+    region_split = get_region_label(leave_in_region, leave_out_region)
     shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year),
                                          "_".join(target_modalities))
     if region_split is not None:

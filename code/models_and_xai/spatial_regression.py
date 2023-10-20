@@ -15,11 +15,7 @@ def parse_single_year(the_year, modalities, leave_out_region=None, leave_in_regi
     mod = "_".join(modalities)
 
     print ("READING IN DATA.")
-    region_split = ""
-    if leave_out_region != None:
-        region_split = f"except_{leave_out_region}_"
-    if leave_in_region != None:
-        region_split = f"{leave_in_region}_"
+    region_split = get_region_label(leave_in_region, leave_out_region)
     dataset = read_spatial_dataset(the_year, leave_in_region=leave_in_region, leave_out_region=leave_out_region)\
         .dropna()
     print (dataset.describe())
