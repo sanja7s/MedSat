@@ -128,7 +128,6 @@ def compute_feature_rank(shap_values_test_df, condition, feature_name="populatio
     feature_importance.to_csv(os.path.join(results_dir, "feature_importance_{}.csv".format(condition)))
 
 def compute_shap_values(target_year, target_modalities, split="spatial", leave_in_region=None, leave_out_region=None):
-    regions_filtering = leave_out_region or leave_in_region
     region_split = None
     if leave_out_region != None:
         region_split = f"except_{leave_out_region}_"
@@ -146,7 +145,7 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
         leave_in_region = None
         leave_out_region = None
 
-    dataset = read_spatial_dataset(target_year, regions_filtering, leave_in_region, leave_out_region)
+    dataset = read_spatial_dataset(target_year, leave_in_region, leave_out_region)
 
     if split == "spatial":
         fold_splits = get_dataset_spatial_fold_splits(dataset, target_year, 1)
