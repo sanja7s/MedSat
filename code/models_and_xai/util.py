@@ -241,14 +241,15 @@ def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_kee
 
     return modalities_features, labels
 
-def merge_with_image_features(dataset):
+def merge_with_image_features(dataset, year):
     if os.path.exists(image_features_folder):
         for season in os.listdir(image_features_folder):
-            image_features_season = os.path.join(image_features_folder, season)
-            if os.path.isdir(image_features_season):
-                image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
-                image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-                dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
+            if str(year) in season:
+                image_features_season = os.path.join(image_features_folder, season)
+                if os.path.isdir(image_features_season):
+                    image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
+                    image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
+                    dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
 def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_image_features=False):
@@ -272,7 +273,7 @@ def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_
             sdataset = sdataset[sdataset['region'] == leave_in_region]
 
     if use_image_features:
-        sdataset = merge_with_image_features(sdataset)
+        sdataset = merge_with_image_features(sdataset, year)
 
     return sdataset
 

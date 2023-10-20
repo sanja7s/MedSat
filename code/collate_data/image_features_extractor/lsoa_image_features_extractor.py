@@ -49,7 +49,7 @@ def extract_lsoa_pixel_statistics(out_image, nodata_value):
 
 
 def aggregate_pixel_statistics(image_features):
-    #aggregation is performed because an LSOA might lie on the boundaries between
+    #aggregation is performed because an LSOA might be a part of multiple Sentinel-2 images
     image_features = image_features.drop(columns=["region", "SEN-2_ID"])
     image_features_mean = image_features.groupby("geography code").agg("mean").filter(regex="^(mean_)|(std_)")
     image_features_max = image_features.groupby("geography code").agg("max").filter(regex="^(max_)")
@@ -74,6 +74,7 @@ def extract_lsoa_image_features(lsoa_shapefile, lsoa_region_mapping_file, image_
 
     lsoa_shapes_and_regions = read_lsoas_with_region_names(lsoa_shapefile, lsoa_region_mapping_file)
     print("Number of LSOAs: {}".format(len(lsoa_shapes_and_regions.index)))
+    print("Number of unique LSOAs {}".format(len(lsoa_shapes_and_regions["LSOA21CD"].unique())))
     print("LSOA CRS: {}".format(lsoa_shapes_and_regions.crs))
     associations = []
 
@@ -118,5 +119,5 @@ if __name__ == '__main__':
     lsoa_shapefile = os.path.join(lsoa_shapefile_root_dir,  "LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC).shp")
     lsoa_region_mapping_file = "../../../data/auxiliary_data/lsoas_regions_mapping.csv"
 
-    image_dir = "../../../data/image_data/England_JJA2020"
+    image_dir = "../../../data/image_data/England_JJA2019"
     extract_lsoa_image_features(lsoa_shapefile, lsoa_region_mapping_file, image_dir)
