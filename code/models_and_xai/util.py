@@ -247,20 +247,18 @@ def merge_with_image_features(dataset):
             image_features_season = os.path.join(image_features_folder, season)
             if os.path.isdir(image_features_season):
                 image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
-                image_features = image_features.filter(regex="^(mean)|(std)")
-                image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
-                # print (image_features)
                 image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-                # print (image_features.columns)
-                # dataset = dataset.merge(image_features, left_index=True, right_index=True)
                 dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
-def read_spatial_dataset(year, regions=False, leave_in_region=None, leave_out_region=None, use_image_features=False):
+def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_image_features=False):
+
     sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
     sdataset.reset_index(inplace=True)
     print (f"LEN OF DATA {len(sdataset)}")
     sdataset.set_index('geography code', inplace=True)
+
+    regions = leave_in_region or leave_out_region
 
     if regions:
         region_mapping = pd.read_csv(f"{auxiliary_data_folder}/lsoas_regions_mapping.csv")
