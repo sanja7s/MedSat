@@ -43,7 +43,7 @@ def get_dataset_spatial_fold_splits(sdataset, year, fold_iterration, val_size=0.
 
 def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalities):
     dataset = pd.read_csv(data_folder+'{}_spatial_raw_master.csv'.format(year), index_col='geography code').dropna()
-    dataset = merge_with_image_features(dataset).dropna()
+    dataset = merge_with_image_features(dataset, year).dropna()
 
     # print ("STANDARDIZING FEATURES.")
     # print (dataset.head(2))
@@ -81,18 +81,14 @@ def perform_repeated_cross_val(year, model_fn, model_dir, modalities=all_modalit
     summarized_results_std.to_csv("{}/{}_{}_std.csv".format(model_results_dir, year, "_".join(modalities)))
 
 # SPATIAL EVALUATION
-def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, modalities=all_modalities):
+def perform_repeated_spatial_cross_val(year, model_fn, model_dir, modalities=all_modalities):
     sdataset = read_spatial_dataset(year)
 
     cross_validation_times = 5
     buffer_radius=None
     folds_test_scores = None
     for i in range(cross_validation_times):
-        if SLOO:
-            fold_splits = get_dataset_spatial_fold_splits(sdataset, year=year, fold_iterration=i)
-        else:
-            fold_splits = get_dataset_spatial_fold_splits(sdataset, year=year, fold_iterration=i)
-
+        fold_splits = get_dataset_spatial_fold_splits(sdataset, year=year, fold_iterration=i)
         cross_val_result = model_fn(fold_splits, modalities)
         if folds_test_scores is None:
             folds_test_scores = cross_val_result
@@ -111,10 +107,7 @@ def perform_repeated_spatial_cross_val(year, model_fn, model_dir, SLOO=False, mo
     summarized_results_mean = summarized_results.mean(axis=0)
     summarized_results_std = summarized_results.std(axis=0)
 
-    if SLOO:
-        model_results_dir = results_folder + "{}/repeated_SLOO_kfold/".format(model_dir)
-    else:
-        model_results_dir = results_folder +  "{}/repeated_spatial_kfold/".format(model_dir)
+    model_results_dir = results_folder +  "{}/repeated_spatial_kfold/".format(model_dir)
     
     if not os.path.exists(model_results_dir):
         os.makedirs(model_results_dir)
