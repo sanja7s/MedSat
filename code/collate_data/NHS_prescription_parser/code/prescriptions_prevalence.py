@@ -4,6 +4,7 @@ import argparse
 import glob 
 import pandas as pd
 import sys
+from matching.commonFunc import writeResultFiles
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
