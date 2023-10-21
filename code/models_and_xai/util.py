@@ -257,7 +257,7 @@ def merge_with_image_features(dataset):
     return dataset
 
 def read_spatial_dataset(year, regions=False):
-    sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
+    sdataset = gpd.read_file(data_folder + '{}_full_spatial_raw_master.geojson'.format(year)).dropna()
     sdataset.reset_index(inplace=True)
     # print (sdataset.head())
     # print (list(sdataset.columns))
