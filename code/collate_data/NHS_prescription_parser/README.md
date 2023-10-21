@@ -10,12 +10,12 @@ This module contains code to compute LSOA level prevalences given
 Simply create a conda environment ```conda env create -f environment.yml```
 Activate the environment 
 
-## 1 Prevalence based on on (a list of) drug name(s). 
+## 1 Prevalence based on (a list of) drug name(s). 
 This will generate prevalence values for a list of drug names. The script will try to find BNF codes for variants of the said drug names and then compute LSOA level prevalences. 
 - Cd into the code directory
 - run the script as such ```python drug_prevalence.py -d metformin -s <Start_YYYYMM> -e <End_YYYYMM>```
 
-## 2 Prevalence based on list of drug names with BNF codes.
+## 2 Prevalence based on a list of drug names with BNF codes.
 This is a toned down version of the above script which takes in a list of drugs and their corresponding BNF codes as a JSON and computes prevalences. Sample list jsons are included. 
 In order to convert an arbitrary list of drugs into this format, you may use the following prompt with GPT completion API. Make sure you douple check the response and the corresponding BNF codes. Also make sure that the temperature is set to 0 and maximum length to its maximum limit. 
 
@@ -75,8 +75,9 @@ The user will send a name of a condition or a symptom, and you must respond in a
   }
 }
 ``` 
-The response should be a wellformed JSON with the mapped drugs for the given condition. 
-Transform this list into the format such as in `sample_list_antidepressants.json`. Having such a list of drug names associated with our condition, we can then run the following commands:
+The response should be a well-formed JSON with the mapped drugs for the given condition. 
+Transform this list into the format such as in `sample_list_antidepressants.json`. Having such a list of drug names associated with our condition, we can then run the following commands (one to extract prevalences for the specific drugs and the other to aggregate those into the condition prevalence):
 
 ```python custom_list_prevalence.py -l ./sample_list_antidepressants.json -s 201901 -e 202012```
+
 ``` python condition_prevalence.py -s 201901 -e 202012 -c depression -custDLFN sample_list_antidepressants.json```
