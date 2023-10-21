@@ -241,29 +241,25 @@ def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_kee
 
     return modalities_features, labels
 
-def merge_with_image_features(dataset):
+def merge_with_image_features(dataset, year):
     if os.path.exists(image_features_folder):
         for season in os.listdir(image_features_folder):
-            image_features_season = os.path.join(image_features_folder, season)
-            if os.path.isdir(image_features_season):
-                image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
-                image_features = image_features.filter(regex="^(mean)|(std)")
-                image_features = image_features.filter(regex="(B01)|(B06)|(B12)$")
-                # print (image_features)
-                image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-                # print (image_features.columns)
-                # dataset = dataset.merge(image_features, left_index=True, right_index=True)
-                dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
+            if str(year) in season:
+                image_features_season = os.path.join(image_features_folder, season)
+                if os.path.isdir(image_features_season):
+                    image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
+                    image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
+                    dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
     return dataset
 
-def read_spatial_dataset(year, regions=False):
-    sdataset = gpd.read_file(data_folder + '{}_full_spatial_raw_master.geojson'.format(year)).dropna()
+def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_image_features=False):
+
+    sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
     sdataset.reset_index(inplace=True)
-    # print (sdataset.head())
-    # print (list(sdataset.columns))
     print (f"LEN OF DATA {len(sdataset)}")
     sdataset.set_index('geography code', inplace=True)
-    # sdataset = merge_with_image_features(sdataset)
+
+    regions = leave_in_region or leave_out_region
 
     if regions:
         region_mapping = pd.read_csv(f"{auxiliary_data_folder}/lsoas_regions_mapping.csv")
@@ -271,6 +267,13 @@ def read_spatial_dataset(year, regions=False):
             .rename(columns={"LSOA21CD":"geography code", "RGN22NM":"region"}).set_index("geography code")
         
         sdataset = sdataset.join(region_mapping)
+        if leave_out_region != None:
+            sdataset = sdataset[sdataset['region'] != leave_out_region]
+        if leave_in_region != None:
+            sdataset = sdataset[sdataset['region'] == leave_in_region]
+
+    if use_image_features:
+        sdataset = merge_with_image_features(sdataset, year)
 
     return sdataset
 
@@ -282,6 +285,15 @@ def standardize_data(dataset):
                 dataset[k].mean())/dataset[k].std(ddof=0)
         
     return dataset
+
+def get_region_label(leave_in_region, leave_out_region):
+    region_split = ""
+    if leave_out_region != None:
+        region_split = f"except_{leave_out_region}_"
+    if leave_in_region != None:
+        region_split = f"{leave_in_region}_"
+
+    return region_split
 
 if __name__ == '__main__':
     split_dataset(2019)
