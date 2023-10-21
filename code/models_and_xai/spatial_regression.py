@@ -73,6 +73,7 @@ def parse_single_year(the_year, modalities, leave_out_region=None, leave_in_regi
 # parse_single_year(2019, ["sociodemographic"])
 # parse_single_year(2019, ["sociodemographic", "environmental", "image"])
 
+parse_single_year(2020, ["sociodemographic", "environmental"])
 parse_single_year(2020, ["sociodemographic", "environmental"], leave_in_region="London")
 parse_single_year(2020, ["sociodemographic", "environmental"], leave_out_region="London")
 

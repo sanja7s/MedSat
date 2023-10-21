@@ -52,7 +52,7 @@ def read_file(file_path):
 
 def main():
     directory_path = input_results_folder  # Replace this with the path to your directory
-    files = [f for f in os.listdir(directory_path) if f.endswith('.txt')]
+    files = [f for f in os.listdir(directory_path) if f.endswith('depression_sociodemographic_environmental_summary_output_filtered.txt')]
 
     for file in files:
         file_path = os.path.join(directory_path, file)
@@ -62,7 +62,55 @@ def main():
         parsed_data = parse_spatial_regression(data)
 
         df_output = pd.DataFrame(parsed_data)
-        df_output = df_output.sort_values(by=['Probability', 'Coefficient'])
+        # df_output = df_output.sort_values(by=['Probability', 'Coefficient'])
+        
+        print(df_output['Variable'])
+
+        # Desired order of rows
+        order = [
+            'NO2',
+            'ndvi',
+            'Asian ethnicity',
+            'Black ethnicity',
+            'occupancy rating rooms +2',
+            'occupancy rating rooms -2',
+            'prof. occupation',
+            'population density',
+            'very good health',
+            'net annual income',
+            '15 to 24 years',
+            '25 to 34 years',
+            '35 to 49 years',
+            '50 to 59 years',
+            '60 to 69 years',
+            'ozone',
+            'PM2.5',
+            'high vegetation LAI',
+            'low vegetation LAI',
+            'temperature',
+            'accumulated precipitation',
+            'water',
+            'trees',
+            'grass',
+            'Mixed ethnicity',
+            'reside in UK for less than 2 years',
+            'total population',
+            'bad health',
+            'deprived',
+            'male',
+            'W_o_depression_quantity_per_capita',
+            'CONSTANT'
+        ]
+
+        # Filter rows where 'Variable' column value is in the order list
+        df_output = df_output[df_output['Variable'].isin(order)]
+
+        # Sort dataframe based on the order list
+        df_output['sort'] = df_output['Variable'].apply(lambda x: order.index(x))
+        df_output = df_output.sort_values('sort').drop('sort', axis=1)
+
+        df_output['Signifiance'] = df_output['Probability'].abs()<0.05
+        df_output['Signifiance'] = df_output['Signifiance'].astype(int)
 
         # print (df_output)
         output_file_name = file.replace(".txt", "_variable_importance.csv")
