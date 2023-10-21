@@ -15,19 +15,12 @@ def parse_single_year(the_year, modalities, leave_out_region=None, leave_in_regi
     mod = "_".join(modalities)
 
     print ("READING IN DATA.")
-    dataset =  read_spatial_dataset(the_year, regions=True).dropna()
+    region_split = get_region_label(leave_in_region, leave_out_region)
+    dataset = read_spatial_dataset(the_year, leave_in_region=leave_in_region, leave_out_region=leave_out_region)\
+        .dropna()
     print (dataset.describe())
     print (list(dataset.columns))
     print ("READING IN DONE.")
-
-    region_split = ""
-
-    if leave_out_region!=None:
-        dataset = dataset[dataset['region'] != leave_out_region]
-        region_split = f"except_{leave_out_region}_"
-    if leave_in_region!=None:
-        dataset = dataset[dataset['region'] == leave_in_region]
-        region_split = f"{leave_in_region}_"
 
     for condition in ["depression"]: # all_conditions
         med_condition = "o_{}_quantity_per_capita".format(condition)
