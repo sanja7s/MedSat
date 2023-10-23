@@ -80,4 +80,4 @@ Transform this list into the format such as in `sample_list_antidepressants.json
 
 ```python custom_list_prevalence.py -l ./sample_list_antidepressants.json -s 201901 -e 202012```
 
-``` python condition_prevalence.py -s 201901 -e 202012 -c depression -custDLFN sample_list_antidepressants.json```
+```python condition_prevalence.py -s 201901 -e 202012 -c depression -custDLFN sample_list_antidepressants.json```
