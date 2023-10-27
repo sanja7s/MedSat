@@ -26,7 +26,7 @@ def parse_single_year(the_year, modalities, leave_out_region=None, leave_in_regi
         med_condition = "o_{}_quantity_per_capita".format(condition)
         print (f"PROCESSING {med_condition}.")    
         # X, y = extract_features_and_labels(dataset, med_condition, modalities + ['spatial'])
-        X, y = extract_features_and_labels(dataset, med_condition, modalities + ['spatial'], columns_to_keep=filtered_columns + ['geometry'], agg_age_columns=True)
+        X, y = extract_features_and_labels(dataset, med_condition, modalities + ['spatial'], columns_to_filter=filtered_columns + ['geometry'], agg_age_columns=True)
         X = X.set_index('geometry')
         
         if 'image' in modalities:

@@ -26,10 +26,10 @@ def save_lsoa_as_tiff(lsoa_image_root_dir, sen2_composite, lsoa_id, lsoa_crop, l
         dest.write(lsoa_crop)
 
 def extract_lsoa_pixel_statistics(out_image, nodata_value):
-    if np.isfinite(nodata_value):
-        masked_data = np.ma.masked_where(out_image == nodata_value, out_image)
-    else:
+    if np.isnan(nodata_value):
         masked_data = np.ma.masked_invalid(out_image)
+    else:
+        masked_data = np.ma.masked_where(out_image == nodata_value, out_image)
 
     median_per_band = np.ma.median(masked_data, axis=(1, 2))
     mean_per_band = masked_data.mean(axis=(1,2))
@@ -84,6 +84,7 @@ def extract_lsoa_image_features(lsoa_shapefile, lsoa_region_mapping_file, image_
         if image_file.endswith(".tif"):
             with rasterio.open(image_abs_path) as sen2_composite:
                 print("Processing image {} with crs {}".format(image_file, sen2_composite.crs))
+                print("No data value: {}".format(sen2_composite.nodata))
                 match_found=False
                 lsoa_shapes_and_regions = lsoa_shapes_and_regions.to_crs(crs=sen2_composite.crs)
                 for key, geom in lsoa_shapes_and_regions.geometry.apply(mapping).items():
@@ -91,15 +92,18 @@ def extract_lsoa_image_features(lsoa_shapefile, lsoa_region_mapping_file, image_
                     lsoa_region = lsoa_shapes_and_regions.loc[key]["RGN22NM"]
                     try:
                         out_image, out_transform = rasterio.mask.mask(sen2_composite, [geom], crop=True)
-                        lsoa_pixels_statistics, col_names = extract_lsoa_pixel_statistics(out_image, sen2_composite.nodata)
+                        lsoa_pixels_statistics, col_names = extract_lsoa_pixel_statistics(out_image,
+                                                                                          sen2_composite.nodata)
                         lsoa_pixels_agg = [lsoa_id, lsoa_region, image_file] + lsoa_pixels_statistics
                         associations.append(lsoa_pixels_agg)
                         if lsoa_region == "London" and num_visualized_lsoas < num_lsoas_to_visualize:
                             save_lsoa_as_tiff(image_dir, sen2_composite, lsoa_id, out_image, out_transform)
                             num_visualized_lsoas = num_visualized_lsoas + 1
                         match_found = True
-                    except:
+                    except ValueError:
                         pass
+                    except Exception as error:
+                        print("Non-cropping error when processing LSOA {} for sen-2 image {}. Exception: {}".format(lsoa_id, image_file, error), flush=True)
 
                 print("LSOA found in image : {}".format(match_found), "Image ID: {}".format(image_file),
                       "Image crs: {}".format(sen2_composite.crs))
@@ -119,5 +123,5 @@ if __name__ == '__main__':
     lsoa_shapefile = os.path.join(lsoa_shapefile_root_dir,  "LSOA_(Dec_2021)_Boundaries_Generalised_Clipped_EW_(BGC).shp")
     lsoa_region_mapping_file = "../../../data/auxiliary_data/lsoas_regions_mapping.csv"
 
-    image_dir = "../../../data/image_data/England_JJA2019"
+    image_dir = "../../../data/image_data/England_JJA2020"
     extract_lsoa_image_features(lsoa_shapefile, lsoa_region_mapping_file, image_dir)

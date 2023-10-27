@@ -210,7 +210,7 @@ def split_dataset(year, ratio_test=0.3):
     return dataset_train, dataset_val, dataset_test
 
 
-def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_keep=None, log_normalize=False, agg_age_columns=False):
+def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_filter=None, log_normalize=False, agg_age_columns=False):
     labels = np.array(dataset[outcome_col])
     if log_normalize and outcome_col in ["o_opioids_quantity_per_capita", "o_total_quantity_per_capita"]:
         labels = np.log(labels)
@@ -224,8 +224,8 @@ def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_kee
         modality_dfs.append(features_per_modality)
 
     modalities_features = pd.concat(modality_dfs, axis=1)
-    if columns_to_keep is not None:
-        modalities_features = modalities_features.filter(columns_to_keep)
+    if columns_to_filter is not None:
+        modalities_features = modalities_features.filter(columns_to_filter)
 
     modalities_features.rename(columns=variable_mapping, inplace=True)
 
@@ -239,28 +239,28 @@ def extract_features_and_labels(dataset, outcome_col, modalities, columns_to_kee
         print (modalities_features.head())
         modalities_features = modalities_features.drop(columns=age_columns)
 
+
     return modalities_features, labels
 
 def merge_with_image_features(dataset, year):
     if os.path.exists(image_features_folder):
         for season in os.listdir(image_features_folder):
-            if str(year) in season:
+            if season.endswith(str(year)):
                 image_features_season = os.path.join(image_features_folder, season)
                 if os.path.isdir(image_features_season):
                     image_features = pd.read_csv(os.path.join(image_features_season, "lsoas_pixel_statistics.csv"), index_col="geography code")
                     image_features.columns = ["image_{}_{}".format(season, col) for col in image_features.columns]
-                    dataset = dataset.merge(image_features, left_index=True, right_index=True, how='outer')
-    return dataset
+                    dataset = dataset.merge(image_features, left_index=True, right_index=True, how='inner')
+
+    return dataset.dropna()
 
 def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_image_features=False):
 
-    sdataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).dropna()
-    sdataset.reset_index(inplace=True)
-    print (f"LEN OF DATA {len(sdataset)}")
-    sdataset.set_index('geography code', inplace=True)
+    sdataset = (gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year))
+                .set_index('geography code')
+                .dropna())
 
     regions = leave_in_region or leave_out_region
-
     if regions:
         region_mapping = pd.read_csv(f"{auxiliary_data_folder}/lsoas_regions_mapping.csv")
         region_mapping = region_mapping[["LSOA21CD","RGN22NM"]]\
@@ -275,8 +275,9 @@ def read_spatial_dataset(year, leave_in_region=None, leave_out_region=None, use_
     if use_image_features:
         sdataset = merge_with_image_features(sdataset, year)
 
-    return sdataset
+    print (f"LEN OF DATA {len(sdataset)}")
 
+    return sdataset
 
 def standardize_data(dataset):
     features_ztransform = [c for c in dataset.columns if not c in ['geography code', 'geography', 'LSOA21NM', 'geometry', 'centroid_x', 'centroid_y']]
