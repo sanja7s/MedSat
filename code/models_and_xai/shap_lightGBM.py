@@ -158,11 +158,11 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
         x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities,
-                                                       columns_to_keep=filtered_columns, agg_age_columns=True)
+                                                       columns_to_filter=None, agg_age_columns=False)
         x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities,
-                                                   columns_to_keep=filtered_columns, agg_age_columns=True)
+                                                   columns_to_filter=None, agg_age_columns=False)
         x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities,
-                                                     columns_to_keep=filtered_columns, agg_age_columns=True)
+                                                     columns_to_filter=None, agg_age_columns=False)
 
         # normalize data
         scaler = StandardScaler()
@@ -218,8 +218,6 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
 if __name__ == '__main__':
 
     target_year = 2020
-    target_modalities = ["sociodemographic", "environmental"]
-    #compute_shap_values(target_year, target_modalities)
-    compute_shap_values(target_year, target_modalities, leave_in_region="London")
-    compute_shap_values(target_year, target_modalities, leave_out_region="London")
+    compute_shap_values(target_year, ["sociodemographic", "environmental"])
+    compute_shap_values(target_year, ["sociodemographic", "environmental", "image"])
 

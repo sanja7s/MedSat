@@ -42,6 +42,7 @@ def train_evaluate_light_gbm(fold_splits, modalities=all_modalities):
         test_r2_scores = []
         test_rmse_scores = []
         med_condition = "o_{}_quantity_per_capita".format(condition)
+        print("Training the LightGBM model for condition {}".format(condition))
         results[condition] = {}
         for fold in fold_splits:
             # Split data into training and validation sets for this fold
@@ -51,6 +52,7 @@ def train_evaluate_light_gbm(fold_splits, modalities=all_modalities):
 
             scaler = StandardScaler()
             x_train, y_train = extract_features_and_labels(train_fold, med_condition, modalities)
+            print("{} model input features for the modalities {}".format(len(x_train.columns), "_".join(modalities)))
             x_train = scaler.fit_transform(x_train)
             x_val, y_val = extract_features_and_labels(val_fold, med_condition, modalities)
             x_val = scaler.transform(x_val)
