@@ -34,7 +34,7 @@ Note: this is the only module in __MEDSAT__ that requires a registration for an 
 	i) Just open the notebooks and run them as any Jupyter Notebook.\
 	ii) There are only two changes you might need to make in this code:\
 		- PROJECT_NAME = 'ee-env-data-extractor' ## TODO: CHANGE TO YOUR PROJECT NAME (if you created a GEE project with a different name)\
-		- your_location = 'ENV_DATA_EXTRACTOR' ## TODO: CHANGE TO YOUR GDRIVE LOCATION (depending on to which location in your Drive you placed the `environmental_data_extractor`; in this case, it was placed under 'MyDrive/ENV_DATA_EXTRACTOR').\
+		- your_location = 'ENV_DATA_EXTRACTOR' ## TODO: CHANGE TO YOUR GDRIVE LOCATION (depending on to which location in your Drive you placed the `environmental_data_extractor`; in this case, it was placed under 'MyDrive/ENV_DATA_EXTRACTOR').
 
 
 
