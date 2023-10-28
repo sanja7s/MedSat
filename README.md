@@ -1,7 +1,7 @@
 
 # __MEDSAT__
 
-The code for __MEDSAT__: A public health dataset for England featuring satellite imagery and medical prescriptions.
+The code for __MEDSAT__: A Public Health Dataset for England Featuring Medical Prescriptions and Satellite Imagery.
 
 
 👩‍⚕️ 🏥 🌲 🏡 💊 💉 🧑‍💼 👨‍👩‍👧‍👦 👶 👵
