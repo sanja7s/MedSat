@@ -15,7 +15,9 @@ In this release, we provide data snapshots for the years 2019 (pre-COVID) and 20
 
 ## DATA ACCESS
 The data can be found at TUMMedia (data sharing service from Technical University Munich):
-    https://doi. org/10.14459/2023mp1714817
+
+    https://doi.org/10.14459/2023mp1714817
+    
 The dataset is released under the CC BY-SA 4.0 license.
 
 
