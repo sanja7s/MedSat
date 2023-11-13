@@ -42,13 +42,13 @@ def plot_correlation_among_features(year, target_modality, features_to_show):
     plt.close()
 
 def get_missing_values_per_year(year):
-    dataset = read_spatial_dataset(year)
+    dataset = gpd.read_file(data_folder + '{}_spatial_raw_master.geojson'.format(year)).set_index('geography code')
     missing_values = dataset.isnull()
     total_rows_missing = missing_values.any(axis=1).sum()
     print("{} instances have missing values for year {}".format(total_rows_missing, year))
     missing_values_per_column = missing_values.sum()
     columns_with_missing_values = missing_values_per_column[missing_values_per_column > 0]
-    columns_with_missing_values.to_csv("./data/{}_missing_values.csv".format(year))
+    columns_with_missing_values.to_csv(os.path.join(descriptive_analysis_dir, "{}_missing_values.csv".format(year)))
 
 
 def plot_distribution(year, columns_of_interest,  modalities, var_name="age group"):
@@ -104,6 +104,7 @@ def plot_light_gbm_fnn_results(year, modalities=all_modalities):
 
 
 if __name__ == '__main__':
+    get_missing_values_per_year(2020)
     plot_light_gbm_fnn_results(2020, ["environmental", "image", "sociodemographic"])
     # plot_correlation_among_features(2020, "environmental", env_features_to_show)
     plot_distribution(2020,
