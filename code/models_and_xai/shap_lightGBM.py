@@ -92,7 +92,7 @@ def visualize_shap_values(shap_explainer, shap_results_base_dir, condition):
     # if condition == "diabetes":
     #     width = 3.3
     fig = plt.figure()
-    shap.summary_plot(shap_explainer, show=False, max_display=20, color_bar=False, cmap="plasma")
+    shap.summary_plot(shap_explainer, show=False, max_display=15, color_bar=False, cmap="plasma")
     plt.gcf().set_size_inches(width, 4.5)
     plt.yticks(fontsize=8)
     plt.xticks(fontsize=8)
@@ -111,7 +111,7 @@ def visualize_shap_values(shap_explainer, shap_results_base_dir, condition):
     plt.xlabel("SHAP", fontsize=10)
     plt.title("{} prescriptions".format(condition), fontsize=10)
     fig.tight_layout()
-    plt.savefig(os.path.join(shap_results_base_dir, "shap_values_{}.pdf".format(condition)), dpi=300)
+    plt.savefig(os.path.join(shap_results_base_dir, "shap_values_{}.png".format(condition)), dpi=300)
     plt.close()
 
 
@@ -129,7 +129,7 @@ def compute_feature_rank(shap_values_test_df, condition, feature_name="populatio
 
 def compute_shap_values(target_year, target_modalities, split="spatial", leave_in_region=None, leave_out_region=None):
     region_split = get_region_label(leave_in_region, leave_out_region)
-    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", str(target_year),
+    shap_results_base_dir = os.path.join(results_folder, "lightGBM", "SHAP", split, str(target_year),
                                          "_".join(target_modalities))
     if region_split is not None:
         shap_results_base_dir = "{}_{}".format(shap_results_base_dir, region_split)
@@ -158,11 +158,11 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
         med_condition = "o_{}_quantity_per_capita".format(condition)
         # Separate features and target variable
         x_train, y_train = extract_features_and_labels(train_data, med_condition, target_modalities,
-                                                       columns_to_filter=None, agg_age_columns=False)
+                                                       columns_to_filter=filtered_columns, agg_age_columns=True)
         x_val, y_val = extract_features_and_labels(val_data, med_condition, target_modalities,
-                                                   columns_to_filter=None, agg_age_columns=False)
+                                                   columns_to_filter=filtered_columns, agg_age_columns=True)
         x_test, y_test = extract_features_and_labels(test_data, med_condition, target_modalities,
-                                                     columns_to_filter=None, agg_age_columns=False)
+                                                     columns_to_filter=filtered_columns, agg_age_columns=True)
 
         # normalize data
         scaler = StandardScaler()
@@ -218,6 +218,6 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
 if __name__ == '__main__':
 
     target_year = 2020
-    compute_shap_values(target_year, ["sociodemographic", "environmental"])
-    compute_shap_values(target_year, ["sociodemographic", "environmental", "image"])
+    #compute_shap_values(target_year, ["sociodemographic", "environmental"])
+    compute_shap_values(target_year, ["geo","sociodemographic", "environmental", "image"], split="random")
 
