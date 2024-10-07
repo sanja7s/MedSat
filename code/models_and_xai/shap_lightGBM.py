@@ -8,7 +8,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import ShuffleSplit
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error, mean_absolute_error
 from math import sqrt
 import lightgbm as lgb
 import shap
@@ -88,14 +88,14 @@ def visualize_dependence_plot(shap_values, x_test, shap_results_base_dir, condit
 
 #latex article class has witdh of 397.484pt
 def visualize_shap_values(shap_explainer, shap_results_base_dir, condition):
-    width = 4
+    width = 5.5
     # if condition == "diabetes":
     #     width = 3.3
     fig = plt.figure()
-    shap.summary_plot(shap_explainer, show=False, max_display=15, color_bar=False, cmap="plasma")
-    plt.gcf().set_size_inches(width, 4.5)
-    plt.yticks(fontsize=8)
-    plt.xticks(fontsize=8)
+    shap.summary_plot(shap_explainer, show=False, max_display=20, color_bar=False, cmap="plasma")
+    plt.gcf().set_size_inches(width, 5.5)
+    plt.yticks(fontsize=12)
+    plt.xticks(fontsize=11)
     # if condition != "diabetes":
     #color = shap.plots.colors.blue_rgb
     #cmap = shap.plots._utils.convert_color(color)
@@ -103,13 +103,13 @@ def visualize_shap_values(shap_explainer, shap_results_base_dir, condition):
     m.set_array([0, 1])
     cb = plt.colorbar(m, ticks=[0, 1], aspect=50)
     cb.set_ticklabels(["Low", "High"])
-    cb.set_label("Feature value", size=10, labelpad=-2)
+    cb.set_label("Feature value", size=11, labelpad=-2)
     cb.ax.tick_params(labelsize=8, length=0)
     cb.set_alpha(1)
     cb.outline.set_visible(False)
 
-    plt.xlabel("SHAP", fontsize=10)
-    plt.title("{} prescriptions".format(condition), fontsize=10)
+    plt.xlabel("SHAP", fontsize=12)
+    plt.title("{} prescriptions".format(condition), fontsize=13)
     fig.tight_layout()
     plt.savefig(os.path.join(shap_results_base_dir, "shap_values_{}.png".format(condition)), dpi=300)
     plt.close()
@@ -181,6 +181,9 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
         test_rmse = sqrt(mean_squared_error(y_test, predictions))
         print('Test RMSE: {} for condition {}'.format(test_rmse, med_condition))
 
+        test_mae = mean_absolute_error(y_test, predictions)
+        print('Test MAE: {} for condition {}'.format(test_mae, med_condition))
+
         predictions_results = pd.DataFrame({"ACTUAL": y_test, "PREDICTED": predictions}, index=x_test.index)
         predictions_results["DIFF"] = (predictions_results["ACTUAL"] - predictions_results["PREDICTED"]).pow(2)
         predictions_results.sort_values(by="DIFF", inplace=True)
@@ -217,7 +220,8 @@ def compute_shap_values(target_year, target_modalities, split="spatial", leave_i
 
 if __name__ == '__main__':
 
-    target_year = 2020
+    target_year = 2019
     #compute_shap_values(target_year, ["sociodemographic", "environmental"])
-    compute_shap_values(target_year, ["geo","sociodemographic", "environmental", "image"], split="random")
+    #compute_shap_values(target_year, ["geo", "sociodemographic", "environmental"], split="random")
+    compute_shap_values(target_year, ["geo","sociodemographic", "environmental"], split="random")
 
