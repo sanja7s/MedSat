@@ -1,83 +1,432 @@
+# NHS Prescription Parser
 
-# Submodule to compute drug or condition prevalences. 
-This module contains code to compute LSOA level prevalences given 
-1. A (list of) drug name(s). 
-2. A list of drug names with their respective BNF codes. 
-3. A list of conditions/symptoms, provided we can find associated drugs from drugbank/GPT/we curated it. 
-4. Opioid OME prevalence.
+**A unified system for computing drug and condition prevalences at the LSOA level in England from NHS prescription data.**
 
-## Installing. 
-Simply create a conda environment ```conda env create -f environment.yml```
-Activate the environment 
+This module is part of the MedSat research project, integrating medical prescription data with satellite imagery for public health research. The system now supports both historical and current NHS data formats with automatic detection and processing.
 
-## 1 Prevalence based on (a list of) drug name(s). 
-This will generate prevalence values for a list of drug names. The script will try to find BNF codes for variants of the said drug names and then compute LSOA level prevalences. 
-- Cd into the code directory
-- run the script as such ```python drug_prevalence.py -d metformin -s <Start_YYYYMM> -e <End_YYYYMM>```
+## 🆕 **What's New in the Unified Version**
 
-## 2 Prevalence based on a list of drug names with BNF codes.
-This is a toned down version of the above script which takes in a list of drugs and their corresponding BNF codes as a JSON and computes prevalences. Sample list jsons are included. 
-In order to convert an arbitrary list of drugs into this format, you may use the following prompt with GPT completion API. Make sure you douple check the response and the corresponding BNF codes. Also make sure that the temperature is set to 0 and maximum length to its maximum limit. 
+- **Single command interface** for all prescription analysis types
+- **Automatic format detection** for old (2014-2021) and new (2021+) data formats
+- **Extended date range support** from 201401 to 202112
+- **Multi-year LSOA mapping** with automatic year detection
+- **Improved error handling** and comprehensive logging
+- **Unified architecture** eliminating code duplication
 
+## 📋 **Quick Start**
+
+### 1. Environment Setup
+
+```bash
+# Clone/navigate to the repository
+cd NHS_prescription_parser
+
+# Set Python version (if using asdf)
+echo "python 3.8.12" > .tool-versions
+
+# Create and activate virtual environment
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Install dependencies
+pip install --upgrade pip
+pip install pandas jupyter "networkx==2.8.4" tqdm requests pytest
 ```
-You are a pharmacy expert who knows the British National Formulary (BNF) codes of all the drugs. You do not make stuff up, and when you don't know some code, you omit that drug from your response. You respond to user query using the following guidelines 
-- When the user sends a list of drug names, you will respond with corresponding BNF codes for the drugs you know. 
-- You will format the response as a JSON with the following schema as a referance
+
+### 2. Quick Test
+
+```bash
+cd code
+python unified_prevalence.py --help
+```
+
+You should see the unified interface help message.
+
+## 🚀 **Usage Guide**
+
+The new unified system provides a single entry point for all prescription analysis:
+
+```bash
+python unified_prevalence.py <command> [options]
+```
+
+### **Available Commands:**
+- `drug` - Calculate prevalence for specific drugs
+- `custom` - Calculate prevalence from custom drug lists
+- `condition` - Calculate prevalence for medical conditions
+
+---
+
+## 📊 **1. Drug Prevalence Analysis**
+
+Calculate prescription prevalence for specific drug names.
+
+### Basic Usage
+```bash
+python unified_prevalence.py drug \
+  -d <drug_names> \
+  -s <start_date> \
+  -e <end_date>
+```
+
+### Examples
+
+**Single drug:**
+```bash
+python unified_prevalence.py drug \
+  -d metformin \
+  -s 202001 -e 202012
+```
+
+**Multiple drugs:**
+```bash
+python unified_prevalence.py drug \
+  -d metformin ibuprofen aspirin \
+  -s 202001 -e 202012
+```
+
+**With specific LSOA year:**
+```bash
+python unified_prevalence.py drug \
+  -d metformin \
+  -s 202101 -e 202103 \
+  -y 2021
+```
+
+**Custom output directory:**
+```bash
+python unified_prevalence.py drug \
+  -d metformin \
+  -s 202001 -e 202012 \
+  -odir /path/to/custom/output
+```
+
+### Options
+- `-d, --drugs` - List of drug names (space-separated)
+- `-s, --start` - Start date (YYYYMM format)
+- `-e, --end` - End date (YYYYMM format)
+- `-y, --year` - Year for LSOA mapping (optional, auto-detected)
+- `-odir, --output_dir` - Custom output directory (optional)
+
+---
+
+## 📝 **2. Custom List Analysis**
+
+Calculate prevalence using predefined JSON files containing drug names and BNF codes.
+
+### Basic Usage
+```bash
+python unified_prevalence.py custom \
+  -l <json_file> \
+  -s <start_date> \
+  -e <end_date>
+```
+
+### Examples
+
+**Using sample antidepressants list:**
+```bash
+python unified_prevalence.py custom \
+  -l sample_list_antidepressants.json \
+  -s 202001 -e 202012
+```
+
+**Using custom anxiety list:**
+```bash
+python unified_prevalence.py custom \
+  -l sample_list_anxiety.json \
+  -s 202101 -e 202103 \
+  -y 2021
+```
+
+### JSON File Format
+Your JSON file should contain drug names mapped to BNF codes:
+```json
 {
-  "fentanyl": ["1501043F0", "1502010Z0", "0407020A0"],
-  "oxycodone": ["0407020AD", "0407020AF", "0407020Z0"],
-  "codine": ["0309020AB"]
+  "drug_category_name": ["BNF_CODE1", "BNF_CODE2", "BNF_CODE3"],
+  "antidepressants": ["0403010A0", "0403020A0", "0403030A0"]
 }
 ```
-once you have the json ready, you may run the prevalence script as follows
 
-```python custom_list_prevalence.py -l ./sample_list_antidepressants.json -s 201901 -e 201901```
+### Options
+- `-l, --list` - Path to JSON file with drug mappings
+- `-s, --start` - Start date (YYYYMM format)
+- `-e, --end` - End date (YYYYMM format)
+- `-y, --year` - Year for LSOA mapping (optional)
 
-## 3 Prevalence for conditions/symptoms.
-There are two ways to run this use case. 
+---
 
-### a) Using drugbank as an aid to find drugs
+## 🏥 **3. Medical Condition Analysis**
 
-This part mathes names of conditions with a drug->condition association graph built from the drugbank crawl. 
+Calculate prevalence for medical conditions using DrugBank disease-drug mappings.
 
-To generate prevalences using condition names 
-
-```python condition_prevalence.py -s YYYYMM -e YYYYMM -c condition_name1 condition_name2```
-
-The prevalences files should be created in data_prep folder, along with a csv file called ```Drugs.csv```that contains associations of named conditions with different drugs and BNF codes.
-
-
-### b) Using custom condition drug name lists.
-
-Here, we have an option b.1) to use a literature-derived or user-curated list of drugs (e.g., `sample_list_antidepressants.json`), or b.2) we can use GPT as an alternative to drugbank to help us associate drugs with the condition. 
-
-#### b.1) Using drug names list we curated from literature or ourselves.
-Example of lists curated by us or from the literature are `sample_list_antidepressants.json`, `sample_list_anxiety.json` or `sample_list_painkiller.json`.
-
-#### b.2) Using GPT as an aid to find drugs.
-In this case, the first step is to run the follwing prompt before asking GPT model about a particular condition. Please note that the prompt is to be run on GPT 3.5 Turbo, max token limit set to maximum, and temperature set to 0.
-
+### Basic Usage
+```bash
+python unified_prevalence.py condition \
+  -c <conditions> \
+  -s <start_date> \
+  -e <end_date>
 ```
-You are a pharmacy expert who knows the British National Formulary (BNF) codes, drug names, and the conditions or symptoms for which those drugs are prescribed. You follow the following guidelines 
-- You do not make stuff up. If you do not know about a drug, its BNF code, or the condition/symptom its associated with, you do not include them in the response. 
-- You respond in wellformed JSON. 
-- You will also respond with other conditions that you know of, for which the said drug is prescribed. 
 
-The user will send a name of a condition or a symptom, and you must respond in a well formed JSON with the following structure
-{ 
- "drug_name_1" : {
-     "BNF_code" : ["Code1", "Code2", "Code3"],
-      "Other_associations" : ["condition 1" , "condition 2" , "condition 3"]
-},
- "drug_name_2" : {
-     "BNF_code" : ["Code1", "Code2", "Code3"],
-      "Other_associations" : ["condition 1" , "condition 2" , "condition 3"]
-  }
+### Examples
+
+**Single condition:**
+```bash
+python unified_prevalence.py condition \
+  -c diabetes \
+  -s 202001 -e 202012
+```
+
+**Multiple conditions:**
+```bash
+python unified_prevalence.py condition \
+  -c diabetes hypertension depression \
+  -s 202001 -e 202012
+```
+
+**Using custom drug lists for conditions:**
+```bash
+python unified_prevalence.py condition \
+  -c depression anxiety \
+  -s 202001 -e 202012 \
+  --custom_drug_list sample_list_antidepressants.json sample_list_anxiety.json
+```
+
+**Treating inputs as drug categories:**
+```bash
+python unified_prevalence.py condition \
+  -c "cardiovascular drugs" "respiratory drugs" \
+  -s 202001 -e 202012 \
+  --is_category
+```
+
+### Options
+- `-c, --conditions` - List of medical conditions (space-separated)
+- `-s, --start` - Start date (YYYYMM format)
+- `-e, --end` - End date (YYYYMM format)
+- `--custom_drug_list` - Paths to custom drug list files (optional)
+- `--is_category` - Treat conditions as drug categories instead of diseases
+- `-y, --year` - Year for LSOA mapping (optional)
+
+---
+
+## ⚙️ **Advanced Configuration**
+
+### Global Options
+All commands support these global options:
+
+```bash
+python unified_prevalence.py <command> [options] \
+  --config config.json \     # Custom configuration file
+  --verbose \                # Enable detailed logging
+  -odir /custom/output       # Custom output directory
+```
+
+### Configuration File
+Create a `config.json` file for custom settings:
+
+```json
+{
+  "mappings_dir": "./mappings/",
+  "output_dir": "../data_prep/",
+  "input_dir": "./prescriptionfiles/",
+  "sources_file": "./sources/serialized_file_paths.json",
+  "logging_level": "INFO",
+  "default_year": 2021
 }
-``` 
-The response should be a well-formed JSON with the mapped drugs for the given condition. 
-Transform this list into the format such as in `sample_list_antidepressants.json`. Having such a list of drug names associated with our condition, we can then run the following commands (one to extract prevalences for the specific drugs and the other to aggregate those into the condition prevalence):
+```
 
-```python custom_list_prevalence.py -l ./sample_list_antidepressants.json -s 201901 -e 202012```
+### Supported Date Ranges
+- **Historical data (old format)**: 201401 to 202102
+- **Current data (new format)**: 202101 to 202112
+- **Overlap period**: 202101-202102 (both formats available)
 
-```python condition_prevalence.py -s 201901 -e 202012 -c depression -custDLFN sample_list_antidepressants.json```
+---
+
+## 📁 **Output Files**
+
+### File Structure
+Results are saved as compressed CSV files:
+```
+data_prep/
+├── <condition_name>_V4.csv.gz
+├── Drugs.csv                    # Drug mapping details
+└── <custom_name>_V4.csv.gz
+```
+
+### Output Format
+Each result file contains:
+- `YYYYMM` - Year and month
+- `LSOA_CODE` - LSOA geographic code
+- `Total_quantity` - Total medication quantity
+- `Dosage_ratio` - Normalized dosage measurement
+- `Total_cost` - Total medication cost
+- `Total_items` - Number of prescription items
+- `Patient_count` - Patient population in LSOA
+
+### Per Capita Calculations
+Use the Jupyter notebooks for post-processing:
+1. `extract_yearly_prevalence.ipynb` - Aggregate monthly to yearly data
+2. `outcomes-master.ipynb` - Create outcome datasets
+
+---
+
+## 🧪 **Testing & Validation**
+
+### Run Unit Tests
+```bash
+cd code
+source ../venv/bin/activate
+python -m pytest tests/ -v
+```
+
+### Run System Analysis
+```bash
+cd code/analysis
+python system_analysis.py
+python basic_analysis.py
+```
+
+### Test Download System
+```bash
+cd code
+python -c "
+from sources.downloader import Downloader
+downloader = Downloader()
+print(f'Available sources: {len(downloader.sources)}')
+print('System ready!')
+"
+```
+
+---
+
+## 🔧 **Troubleshooting**
+
+### Common Issues
+
+**1. Module Import Errors**
+```bash
+# Ensure you're in the code directory
+cd code
+source ../venv/bin/activate
+```
+
+**2. Missing Dependencies**
+```bash
+pip install pandas jupyter "networkx==2.8.4" tqdm requests
+```
+
+**3. Date Range Errors**
+- Check date format is YYYYMM
+- Ensure dates are within 201401-202112 range
+- Verify start date is before end date
+
+**4. Missing Mapping Files**
+```bash
+# Check required files exist
+ls mappings/
+# Should contain: drug_association_graph.gexf, category_association_graph.gexf, CHEM_MASTER_MAP.csv
+```
+
+**5. Download Failures**
+- Check internet connection
+- Verify Dropbox links are accessible
+- Use `--verbose` flag for detailed error messages
+
+### Getting Help
+```bash
+# General help
+python unified_prevalence.py --help
+
+# Command-specific help
+python unified_prevalence.py drug --help
+python unified_prevalence.py custom --help
+python unified_prevalence.py condition --help
+```
+
+---
+
+## 📚 **Legacy Compatibility**
+
+The original scripts are still available:
+- `drug_prevalence.py`
+- `custom_list_prevalence.py`
+- `condition_prevalence.py`
+
+However, we recommend using the new unified interface for:
+- Better error handling
+- Automatic format detection
+- Consistent behavior
+- Enhanced logging
+
+---
+
+## 🎯 **Example Workflows**
+
+### Complete Diabetes Analysis
+```bash
+# 1. Calculate diabetes prevalence for 2020
+python unified_prevalence.py condition \
+  -c diabetes \
+  -s 202001 -e 202012 \
+  -y 2020 \
+  --verbose
+
+# 2. Post-process with Jupyter notebooks
+jupyter notebook extract_yearly_prevalence.ipynb
+```
+
+### Multi-Drug Comparison
+```bash
+# Compare multiple cardiovascular drugs
+python unified_prevalence.py drug \
+  -d "metoprolol" "atenolol" "bisoprolol" \
+  -s 202001 -e 202012 \
+  -odir cardiovascular_analysis
+```
+
+### Custom Research Study
+```bash
+# 1. Create custom drug list (my_drugs.json)
+# 2. Run analysis
+python unified_prevalence.py custom \
+  -l my_drugs.json \
+  -s 202101 -e 202103 \
+  -y 2021
+
+# 3. Analyze results
+python -c "
+import pandas as pd
+df = pd.read_csv('../data_prep/my_category_V4.csv.gz')
+print(df.groupby('YYYYMM')['Total_quantity'].sum())
+"
+```
+
+---
+
+## 📖 **Additional Resources**
+
+- **Detailed Implementation**: See `COMPREHENSIVE_TESTING_REPORT.md`
+- **Architecture Details**: See `code/unified/unified_processor.py`
+- **Research Paper**: `NeurIPS-2023-medsat-a-public-health-dataset-for-england.pdf`
+- **Manual Processing**: See `code/MANUAL_PROCESSING_GUIDE.md`
+
+---
+
+## 🤝 **Contributing**
+
+When contributing to this project:
+1. Use the virtual environment
+2. Run tests before submitting
+3. Follow the unified architecture patterns
+4. Update documentation for new features
+
+---
+
+## 📄 **License & Citation**
+
+This code is part of the MedSat research project. If you use this code in your research, please cite the MedSat paper.
+
+---
+
+*For technical support or questions about the unified system, please refer to the comprehensive testing report or create an issue.*
