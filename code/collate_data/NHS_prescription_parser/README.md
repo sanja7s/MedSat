@@ -277,7 +277,7 @@ Use the Jupyter notebooks for post-processing:
 ```bash
 cd code
 source ../venv/bin/activate
-python -m pytest tests/ -v
+python -m unittest discover tests -v
 ```
 
 ### Run System Analysis
