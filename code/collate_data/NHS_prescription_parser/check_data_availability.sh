@@ -49,7 +49,7 @@ if [ -d "code/prescriptionfiles" ]; then
     DATES=($(find code/prescriptionfiles -name "*.gz" | grep -o '[0-9]\{6\}' | sort))
     if [ ${#DATES[@]} -gt 0 ]; then
         echo "   Date range: ${DATES[0]} to ${DATES[-1]}"
-        echo "   Available dates: ${DATES[@]}"
+        echo "   Available dates: ${DATES[@]:0:10}..."  # Show first 10 dates
     else
         echo "   ❌ No prescription files found"
     fi

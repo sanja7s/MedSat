@@ -8,7 +8,7 @@ This module is part of the MedSat research project, integrating medical prescrip
 
 ```bash
 git clone <repository-url>
-cd NHS_prescription_parser
+cd MedSat/code/collate_data/NHS_prescription_parser
 ./bootstrap.sh
 ```
 

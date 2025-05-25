@@ -234,7 +234,7 @@ except Exception as e:
     print('   Continuing with existing files')
 " 2>/dev/null || print_warning "Could not run file availability check"
 
-cd ..
+# Stay in NHS_prescription_parser directory for script creation
 
 # Create activation script
 print_status "Creating activation script..."
@@ -242,7 +242,7 @@ cat > activate_env.sh << 'EOF'
 #!/bin/bash
 # Activate NHS Prescription Parser environment
 echo "🏥 Activating NHS Prescription Parser environment..."
-source venv/bin/activate
+source ./venv/bin/activate
 echo "✅ Environment activated! Use 'deactivate' to exit."
 echo ""
 echo "Quick start commands:"
@@ -262,7 +262,7 @@ cat > run_analysis.sh << 'EOF'
 set -e
 
 # Activate environment
-source venv/bin/activate
+source ./venv/bin/activate
 
 # Change to code directory
 cd code
@@ -408,7 +408,7 @@ echo "🔍 NHS Prescription Parser Setup Verification"
 echo "============================================="
 
 # Activate environment
-source venv/bin/activate
+source ./venv/bin/activate
 
 echo "✅ Virtual environment activated"
 
