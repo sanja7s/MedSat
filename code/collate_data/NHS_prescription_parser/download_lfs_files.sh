@@ -31,11 +31,14 @@ print_error() {
 echo "🗂️ NHS Prescription Parser - LFS File Downloader"
 echo "=================================================="
 
-# Check if we're in a git repository
-if [ ! -d ".git" ]; then
-    print_error "Not in a git repository. Please run from the NHS_prescription_parser root directory."
+# Find git repository root
+GIT_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || echo "")
+if [ -z "$GIT_ROOT" ]; then
+    print_error "Not in a git repository. Please run from within the MedSat repository."
     exit 1
 fi
+
+print_status "Git repository found at: $GIT_ROOT"
 
 # Check for Git LFS
 if ! command -v git-lfs &> /dev/null; then
@@ -50,6 +53,9 @@ if ! command -v git-lfs &> /dev/null; then
 fi
 
 print_success "Git LFS found"
+
+# Change to git root directory for LFS operations
+cd "$GIT_ROOT"
 
 # Initialize LFS
 print_status "Initializing Git LFS..."
