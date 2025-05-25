@@ -2,3 +2,5 @@ code/mappings/GP_LSOA_weights_2013.csv filter=lfs diff=lfs merge=lfs -text
 code/mappings/GP_LSOA_PATIENTSDIST_2021.json filter=lfs diff=lfs merge=lfs -text
 code/mappings/GP_LSOA_PATIENTSDIST.json filter=lfs diff=lfs merge=lfs -text
 code/mappings/gp-reg-pat-prac-lsoa-all_*.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/* filter=lfs diff=lfs merge=lfs -text
+.DS_Store binary
