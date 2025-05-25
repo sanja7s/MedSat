@@ -1,9 +1,4 @@
-../mappings/gp-reg-pat-prac-lsoa-all_*.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/census2021_lsoa_level.xlsx filter=lfs diff=lfs merge=lfs -text
-../mappings/GP_LSOA_weights_2013.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2020.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2021.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2022.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2023.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2024.csv filter=lfs diff=lfs merge=lfs -text
-../mappings/gp-reg-pat-prac-lsoa-all_2025.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/GP_LSOA_weights_2013.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/GP_LSOA_PATIENTSDIST_2021.json filter=lfs diff=lfs merge=lfs -text
+code/mappings/GP_LSOA_PATIENTSDIST.json filter=lfs diff=lfs merge=lfs -text
+code/mappings/gp-reg-pat-prac-lsoa-all_*.csv filter=lfs diff=lfs merge=lfs -text
