@@ -95,12 +95,38 @@ if command -v git-lfs &> /dev/null; then
     # Initialize LFS if needed
     if [ -d ".git" ]; then
         git lfs install
-        print_status "Attempting to pull LFS files..."
-        git lfs pull || print_warning "Could not pull LFS files (this is okay if files aren't set up yet)"
+        print_status "Downloading LFS files (47 files, ~196MB)..."
+        
+        # Try multiple approaches to ensure all LFS files are downloaded
+        git lfs fetch --all
+        git lfs pull
+        
+        # Verify LFS download
+        LFS_COUNT=$(git lfs ls-files 2>/dev/null | wc -l | tr -d ' ')
+        if [ "$LFS_COUNT" -gt 40 ]; then
+            print_success "Successfully downloaded $LFS_COUNT LFS files"
+        else
+            print_warning "Only $LFS_COUNT LFS files found (expected ~47)"
+            print_status "Trying to checkout LFS files explicitly..."
+            git lfs checkout
+        fi
+        
+        # Check if mapping files are actual data (not pointers)
+        if [ -f "code/mappings/CHEM_MASTER_MAP.csv" ]; then
+            FIRST_LINE=$(head -1 code/mappings/CHEM_MASTER_MAP.csv 2>/dev/null || echo "")
+            if [[ "$FIRST_LINE" == "version https://git-lfs.github.com/spec/v1" ]]; then
+                print_warning "Mapping files are still LFS pointers, not downloaded"
+                print_status "Attempting to download specific files..."
+                git lfs pull --include="code/mappings/*"
+            else
+                print_success "Mapping files successfully downloaded"
+            fi
+        fi
     fi
 else
     print_warning "Git LFS not found. Large mapping files may not be available."
     print_status "Install with: brew install git-lfs (macOS) or apt-get install git-lfs (Ubuntu)"
+    print_status "After installing: git lfs install && git lfs pull"
 fi
 
 # Check file availability and offer downloads
