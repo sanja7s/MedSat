@@ -5,6 +5,7 @@ import glob
 import pandas as pd
 from matching.commonFunc import str2bool
 from matching.commonFunc import writeResultFiles, calculateTemporalMetrics_LSOA
+from matching.commonFunc_updated import detect_file_format
 from matching.drugMatching import DrugMatcher
 from sources.downloader import Downloader
 from tqdm import tqdm
@@ -80,7 +81,6 @@ if __name__ == '__main__':
         for f in tqdm(files_sub):
             month = f.split('/')[-1].split('.')[0]
             print("Working with file  " + f)
-            old = False
             
             monthly_borough_dosage_new[month] = {}
             monthly_borough_costs_new[month] = {}
@@ -88,6 +88,12 @@ if __name__ == '__main__':
             monthly_borough_items_new[month] = {}
 
             pdp = pd.read_csv(f,compression='gzip')
+            
+            # Detect file format and get appropriate field mappings
+            fields = detect_file_format(pdp)
+            bnf_field = fields['bnfField']
+            old = (fields['format'] == 'old')
+            
             for disease in tqdm(drugMap):
                 print("Working with disease  " + disease)
                 monthly_borough_dosage_new[month][disease] = {}
@@ -97,7 +103,7 @@ if __name__ == '__main__':
 
 
                 drugs = drugMap[disease]
-                opioids = pdp.loc[pdp['16'].isin(drugs)] #Original opioids
+                opioids = pdp.loc[pdp[bnf_field].isin(drugs)] #Original opioids
 
                 monthly_borough_quantity_new[month][disease] , monthly_borough_costs_new[month][disease], monthly_borough_dosage_new[month][disease], monthly_borough_items_new[month][disease] = calculateTemporalMetrics_LSOA(opioids, mappings_dir='./mappings/', old = old)
 
