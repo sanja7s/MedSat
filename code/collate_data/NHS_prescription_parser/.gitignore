@@ -45,6 +45,16 @@ code/*_SUMMARY.md
 code/MANUAL_PROCESSING_GUIDE.md
 code/README_EXTENDED.md
 
+# Auto-generated utility scripts (created by bootstrap.sh)
+activate_env.sh
+download_files.sh
+run_analysis.sh
+verify_setup.sh
+code/activate_env.sh
+code/download_files.sh
+code/run_analysis.sh
+code/verify_setup.sh
+
 # Project specific
 CLAUDE.md
 *.pdf
