@@ -103,15 +103,109 @@ else
     print_status "Install with: brew install git-lfs (macOS) or apt-get install git-lfs (Ubuntu)"
 fi
 
-# Check file availability
+# Check file availability and offer downloads
 print_status "Checking file availability..."
 cd code
+
+# Smart file availability check with download option
 python3 -c "
 import sys
 sys.path.append('claude_experiments')
-from handle_missing_files import generate_missing_files_report
+
 print()
-generate_missing_files_report('../mappings/')
+print('🔍 Checking essential files status...')
+
+# Try enhanced check first
+try:
+    from download_essential_files import EssentialFilesDownloader
+    
+    downloader = EssentialFilesDownloader()
+    missing, available = downloader.check_missing_files()
+    
+    if available:
+        print(f'✅ Found {len(available)} files already available')
+        for file_info in available:
+            essential_mark = '⭐' if file_info['essential'] else '📄'
+            print(f'   {essential_mark} {file_info[\"file\"]} ({file_info[\"size_mb\"]:.1f}MB)')
+    
+    if missing:
+        essential_missing = [f for f in missing if f['essential']]
+        if essential_missing:
+            print(f'\\n⚠️  Missing {len(essential_missing)} essential files:')
+            for f in essential_missing:
+                print(f'   - {f[\"file\"]} (~{f[\"size_mb\"]}MB) - {f[\"description\"]}')
+            
+            print('\\n📥 Options:')
+            print('   1. Try downloading essential files automatically')
+            print('   2. Generate sample data (reduced accuracy)')
+            print('   3. Continue without (basic functionality)')
+            print('   4. Exit and install Git LFS first')
+            
+            try:
+                choice = input('\\nChoose option (1-4): ').strip()
+                
+                if choice == '1':
+                    print('\\n📥 Attempting to download essential files...')
+                    success = downloader.download_essential_files(essential_only=True)
+                    if success:
+                        print('🎉 Essential files downloaded successfully!')
+                    else:
+                        print('⚠️  Downloads failed. Trying sample data generation...')
+                        # Fallback to sample data
+                        for f in essential_missing:
+                            if 'gp-reg-pat-prac-lsoa-all' in f['file']:
+                                target_path = downloader.mappings_dir / f['file']
+                                downloader.generate_sample_gp_registry(target_path, 2021)
+                            elif 'LSOA_DEC' in f['file']:
+                                target_path = downloader.mappings_dir / f['file']
+                                downloader.generate_sample_lsoa_lookup(target_path)
+                        print('✅ Sample data generated - reduced accuracy expected')
+                        
+                elif choice == '2':
+                    print('\\n🔧 Generating sample data...')
+                    for f in essential_missing:
+                        if 'gp-reg-pat-prac-lsoa-all' in f['file']:
+                            target_path = downloader.mappings_dir / f['file']
+                            downloader.generate_sample_gp_registry(target_path, 2021)
+                        elif 'LSOA_DEC' in f['file']:
+                            target_path = downloader.mappings_dir / f['file']
+                            downloader.generate_sample_lsoa_lookup(target_path)
+                    print('✅ Sample data generated successfully!')
+                    
+                elif choice == '3':
+                    print('\\n📝 Continuing with existing files only')
+                    print('   System will use fallback JSON data (reduced accuracy)')
+                    
+                elif choice == '4':
+                    print('\\n🔧 To install Git LFS:')
+                    print('   macOS: brew install git-lfs')
+                    print('   Ubuntu: sudo apt-get install git-lfs')
+                    print('   Then run: git lfs install && git lfs pull')
+                    print('   Finally rerun: ./bootstrap.sh')
+                    sys.exit(0)
+                else:
+                    print('\\n📝 Invalid choice, continuing with existing files')
+                    
+            except (EOFError, KeyboardInterrupt):
+                print('\\n📝 Skipping download, continuing with existing files')
+        else:
+            print('✅ All essential files are available!')
+    else:
+        print('✅ All files are available!')
+        
+except ImportError:
+    # Fallback to basic check
+    try:
+        from handle_missing_files import generate_missing_files_report
+        generate_missing_files_report('../mappings/')
+        print('\\n💡 For automatic downloads, ensure download_essential_files.py is available')
+    except:
+        print('⚠️  Could not run detailed file check')
+        print('   Basic functionality should still work with existing files')
+
+except Exception as e:
+    print(f'⚠️  File check error: {e}')
+    print('   Continuing with existing files')
 " 2>/dev/null || print_warning "Could not run file availability check"
 
 cd ..
@@ -248,6 +342,36 @@ EOF
 
 chmod +x run_analysis.sh
 
+# Create download files script for later use
+print_status "Creating download files script..."
+cat > download_files.sh << 'EOF'
+#!/bin/bash
+# Download Essential Files for NHS Prescription Parser
+
+# Activate environment
+if [ -f "venv/bin/activate" ]; then
+    source venv/bin/activate
+else
+    echo "❌ Virtual environment not found. Run ./bootstrap.sh first."
+    exit 1
+fi
+
+echo "📥 NHS Prescription Parser - File Downloader"
+echo "============================================"
+
+# Check if download utility exists
+if [ -f "code/claude_experiments/download_essential_files.py" ]; then
+    cd code
+    python claude_experiments/download_essential_files.py "$@"
+else
+    echo "❌ Download utility not found."
+    echo "   Please ensure you have the latest version of the repository."
+    exit 1
+fi
+EOF
+
+chmod +x download_files.sh
+
 # Create quick setup verification script
 print_status "Creating verification script..."
 cat > verify_setup.sh << 'EOF'
@@ -354,29 +478,61 @@ echo "   ./run_analysis.sh condition depression 2021"
 echo "   ./run_analysis.sh custom code/sample_list_antidepressants.json 2021"
 echo ""
 echo "📁 Output will be in: data_prep/"
+echo ""
+echo "💡 Additional utilities:"
+echo "   ./download_files.sh    # Download missing files anytime"
 
 # Create a simple getting started guide
 cat > GETTING_STARTED.md << 'EOF'
 # Getting Started with NHS Prescription Parser
 
-## 🚀 Quick Setup
+## 🚀 One-Command Setup
 
-1. **Clone and bootstrap:**
-   ```bash
-   git clone <repository-url>
-   cd NHS_prescription_parser
-   ./bootstrap.sh
-   ```
+```bash
+git clone <repository-url>
+cd NHS_prescription_parser
+./bootstrap.sh
+```
 
-2. **Activate environment:**
-   ```bash
-   source activate_env.sh
-   ```
+The bootstrap script will:
+- ✅ Set up Python environment and dependencies
+- ✅ Check for missing essential files
+- ✅ Offer to download or generate sample data
+- ✅ Create all utility scripts
+- ✅ Guide you through Git LFS setup if needed
 
-3. **Verify setup:**
-   ```bash
-   ./verify_setup.sh
-   ```
+## 📥 File Download Options (During Bootstrap)
+
+When essential files are missing, you'll see:
+```
+⚠️  Missing 2 essential files:
+   - gp-reg-pat-prac-lsoa-all_2021.csv (~63MB) - GP Registry 2021
+
+📥 Options:
+   1. Try downloading essential files automatically
+   2. Generate sample data (reduced accuracy)  
+   3. Continue without (basic functionality)
+   4. Exit and install Git LFS first
+
+Choose option (1-4):
+```
+
+**Recommended**: Choose option 1 for best accuracy, or option 2 for quick testing.
+
+## 🚀 Ready to Use
+
+After bootstrap completes:
+
+```bash
+# Activate environment (if not auto-activated)
+source activate_env.sh
+
+# Verify everything works
+./verify_setup.sh
+
+# Start analyzing
+./run_analysis.sh drug metformin 2021
+```
 
 ## 📊 Running Analysis
 
