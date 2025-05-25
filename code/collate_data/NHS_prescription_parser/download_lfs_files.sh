@@ -57,6 +57,19 @@ print_success "Git LFS found"
 # Change to git root directory for LFS operations
 cd "$GIT_ROOT"
 
+# Find the NHS prescription parser directory within the git repo
+NHS_PARSER_DIR=""
+if [ -d "code/collate_data/NHS_prescription_parser" ]; then
+    NHS_PARSER_DIR="code/collate_data/NHS_prescription_parser"
+elif [ -d "NHS_prescription_parser" ]; then
+    NHS_PARSER_DIR="NHS_prescription_parser"
+else
+    print_error "Cannot find NHS_prescription_parser directory in git repository"
+    exit 1
+fi
+
+print_status "Found NHS parser at: $NHS_PARSER_DIR"
+
 # Initialize LFS
 print_status "Initializing Git LFS..."
 git lfs install
@@ -88,7 +101,7 @@ git lfs checkout
 
 # Approach 4: Pull specific patterns if needed
 print_status "Step 4/4: Ensuring mapping files are downloaded..."
-git lfs pull --include="code/mappings/*" || true
+git lfs pull --include="$NHS_PARSER_DIR/code/mappings/*" || true
 git lfs pull --include="*.json,*.csv,*.pkl,*.gexf" || true
 
 # Verify download
@@ -109,8 +122,8 @@ print_status "Checking mapping files..."
 MAPPING_COUNT=0
 POINTER_COUNT=0
 
-if [ -d "code/mappings" ]; then
-    for file in code/mappings/*.{json,csv,pkl,gexf}; do
+if [ -d "$NHS_PARSER_DIR/code/mappings" ]; then
+    for file in $NHS_PARSER_DIR/code/mappings/*.{json,csv,pkl,gexf}; do
         if [ -f "$file" ]; then
             MAPPING_COUNT=$((MAPPING_COUNT + 1))
             
@@ -130,12 +143,12 @@ if [ -d "code/mappings" ]; then
         print_status "Attempting to force download these files..."
         
         # Try to download the pointer files specifically
-        for file in code/mappings/*.{json,csv,pkl,gexf}; do
+        for file in $NHS_PARSER_DIR/code/mappings/*.{json,csv,pkl,gexf}; do
             if [ -f "$file" ]; then
                 FIRST_LINE=$(head -1 "$file" 2>/dev/null || echo "")
                 if [[ "$FIRST_LINE" == "version https://git-lfs.github.com/spec/v1" ]]; then
                     print_status "Downloading $(basename "$file")..."
-                    git lfs pull --include="$file" || true
+                    git lfs pull --include="$(echo "$file" | sed "s|^$GIT_ROOT/||")" || true
                 fi
             fi
         done
@@ -143,7 +156,7 @@ if [ -d "code/mappings" ]; then
         print_success "All mapping files successfully downloaded!"
     fi
 else
-    print_error "Mapping directory not found: code/mappings"
+    print_error "Mapping directory not found: $NHS_PARSER_DIR/code/mappings"
 fi
 
 # Final verification
@@ -157,7 +170,7 @@ git lfs status | head -5
 # File sizes
 echo ""
 echo "Sample file sizes:"
-for file in code/mappings/GP_LSOA_weights_2013.csv code/mappings/GP_LSOA_PATIENTSDIST_2021.json code/mappings/CHEM_MASTER_MAP.csv; do
+for file in $NHS_PARSER_DIR/code/mappings/GP_LSOA_weights_2013.csv $NHS_PARSER_DIR/code/mappings/GP_LSOA_PATIENTSDIST_2021.json $NHS_PARSER_DIR/code/mappings/CHEM_MASTER_MAP.csv; do
     if [ -f "$file" ]; then
         SIZE=$(ls -lh "$file" | awk '{print $5}')
         echo "  $(basename "$file"): $SIZE"
