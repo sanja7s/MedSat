@@ -1,0 +1,9 @@
+# Git LFS tracking for all mapping files
+code/mappings/* filter=lfs diff=lfs merge=lfs -text
+
+# Specific future files
+code/mappings/gp-reg-pat-prac-lsoa-all_*.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/census2021_lsoa_level.xlsx filter=lfs diff=lfs merge=lfs -text
+
+# Exclude .DS_Store from LFS
+.DS_Store binary

@@ -1,25 +1,3 @@
-,BNF_code,Drug_name,Mapped_Condition
-104,0401020A0,Alprazolam,anxiety
-116,0403010B0,Amitriptyline Hydrochloride,anxiety
-118,0401020G0,Bromazepam,anxiety
-112,0401020B0,Buspirone Hydrochloride,anxiety
-111,0401020D0,Chlordiazepoxide,anxiety
-113,0401020E0,Chlordiazepoxide Hydrochloride,anxiety
-114,0403030D0,Citalopram Hydrobromide,anxiety
-123,0401020V0,Clorazepate Dipotassium,anxiety
-107,0401020K0,Diazepam,anxiety
-121,0704020AA,Duloxetine Hydrochloride,anxiety
-120,0403030X0,Escitalopram,anxiety
-119,0408010G0,Gabapentin,anxiety
-105,0304010J0,Hydroxyzine Hydrochloride,anxiety
-108,0401020P0,Lorazepam,anxiety
-109,0401020R0,Meprobamate,anxiety
-125,0403040X0,Mirtazapine,anxiety
-110,0401020T0,Oxazepam,anxiety
-106,0403030P0,Paroxetine Hydrochloride,anxiety
-117,0402010Q0,Perphenazine,anxiety
-127,0406000T0,Prochlorperazine Maleate,anxiety
-115,0204000R0,Propranolol Hydrochloride,anxiety
-122,0402010AB,Quetiapine,anxiety
-126,0402010X0,Trifluoperazine,anxiety
-124,0403040W0,Venlafaxine,anxiety
+version https://git-lfs.github.com/spec/v1
+oid sha256:ffa97fcde65540f3cac3271ae59ae1679d0674e38f1deb944dbd73398de51c2e
+size 990

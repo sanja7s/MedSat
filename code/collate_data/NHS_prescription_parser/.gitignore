@@ -1,2 +1,50 @@
+# Python
 *.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# Downloaded data files
 data/*.zip
+data_prep/*.ZIP
+data_prep/*.xlsx
+data_prep/*.csv
+code/prescriptionfiles/
+tmp_extract/
+temp_extract/
+
+# System files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.tool-versions
+
+# Node.js (if any)
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Generated documentation and reports
+code/*_REPORT.md
+code/*_SUMMARY.md
+code/MANUAL_PROCESSING_GUIDE.md
+code/README_EXTENDED.md
+
+# Project specific
+CLAUDE.md
+*.pdf
