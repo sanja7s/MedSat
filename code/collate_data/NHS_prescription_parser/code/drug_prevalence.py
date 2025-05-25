@@ -8,6 +8,7 @@ from matching.drugMatching import DrugMatcher
 from sources.downloader import Downloader
 from tqdm import tqdm
 from matching.commonFunc import writeResultFiles, calculateTemporalMetrics_LSOA
+from matching.commonFunc_updated import detect_file_format
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -65,7 +66,6 @@ if __name__ == '__main__':
     for f in tqdm(files_sub):
         month = f.split('/')[-1].split('.')[0]
         print("Working with month  " + month)
-        old = False
         
         monthly_borough_dosage_new[month] = {}
         monthly_borough_costs_new[month] = {}
@@ -73,6 +73,12 @@ if __name__ == '__main__':
         monthly_borough_items_new[month] = {}
 
         pdp = pd.read_csv(f,compression='gzip')
+        
+        # Detect file format and get appropriate field mappings
+        fields = detect_file_format(pdp)
+        bnf_field = fields['bnfField']
+        old = (fields['format'] == 'old')
+        
         for drugname in tqdm(drugMap):
             print("Working with drug  " + drugname)
             monthly_borough_dosage_new[month][drugname] = {}
@@ -83,7 +89,7 @@ if __name__ == '__main__':
 
             drugs = drugMap[drugname]
             
-            drug_prescriptions = pdp.loc[pdp['16'].isin(drugs)] #Subset of prescriptions from drugs
+            drug_prescriptions = pdp.loc[pdp[bnf_field].isin(drugs)] #Subset of prescriptions from drugs
             print(f"found {len(drug_prescriptions)} rows for {len(drugs)} variants of {drugname}")
 
             monthly_borough_quantity_new[month][drugname] , monthly_borough_costs_new[month][drugname], monthly_borough_dosage_new[month][drugname]  , monthly_borough_items_new[month][drugname] = calculateTemporalMetrics_LSOA(drug_prescriptions, mappings_dir='./mappings/', old=old)
