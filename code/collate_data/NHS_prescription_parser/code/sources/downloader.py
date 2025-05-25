@@ -29,7 +29,7 @@ class Downloader():
 
     def is_date_format_(self, input_string):
         # check if the input string matches the format YYYYMM
-        pattern = re.compile('^(19|20)\d\d(0[1-9]|1[0-2])$')
+        pattern = re.compile(r'^(19|20)\d\d(0[1-9]|1[0-2])$')
         return bool(pattern.match(input_string))
     
     def generate_dates(self , start, end):
