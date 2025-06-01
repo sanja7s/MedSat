@@ -62,6 +62,9 @@ The bootstrap creates an easy-to-use analysis runner:
 
 # Analyze specific months
 ./run_analysis.sh drug metformin 2021-01:06  # Jan-Jun 2021
+
+# Multi-year analysis
+./run_analysis.sh drug metformin 2018:2021  # 2018-2021, all months
 ```
 
 ## 📋 **Advanced Usage**
@@ -374,7 +377,17 @@ For newer NHS data formats with 2021 LSOA boundaries, use the extended interface
 
 ```bash
 cd code
+# Drug analysis with extended features
 python run_extended.py drug -d metformin -s 202110 -e 202110 -y 2021
+
+# Condition analysis with extended features  
+python run_extended.py condition -c asthma -s 201801 -e 202409 -y 2021
+
+# Custom list with extended features
+python run_extended.py list -l sample_list_antidepressants.json -s 202101 -e 202112 -y 2021
+
+# Opioid analysis with OME calculations
+python run_extended.py opioid -d tramadol -s 202101 -e 202112 -y 2021
 ```
 
 **Available extended commands:**
@@ -382,6 +395,11 @@ python run_extended.py drug -d metformin -s 202110 -e 202110 -y 2021
 - `list` - Custom list analysis with new format
 - `condition` - Condition analysis with updated boundaries
 - `opioid` - Specialized opioid OME calculations
+
+**Note**: `run_extended.py` is recommended for:
+- Data spanning 2021+ (newer NHS format)
+- Multi-year analysis requiring 2021 LSOA boundaries
+- Specialized opioid OME calculations
 
 ## 📊 **Testing & Validation Framework**
 
