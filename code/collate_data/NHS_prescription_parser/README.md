@@ -218,14 +218,19 @@ jupyter notebook extract_yearly_prevalence.ipynb
 # Run verification script
 ./verify_setup.sh
 
-# Run unit tests
+# Run unit tests (recommended)
 cd code
+./run_tests.sh
+
+# Alternative: Run tests manually
+cd code
+source ../venv/bin/activate
 python -m unittest discover tests -v
 
 # Test download system
 python -c "
 from sources.downloader import Downloader
-downloader = Downloader()
+downloader = Downloader(sourcesFile='sources/serialized_file_paths.json')
 print(f'Available sources: {len(downloader.sources)}')
 "
 ```
@@ -397,6 +402,13 @@ python statistical_validation_analysis.py
 ### Unit Tests
 ```bash
 cd code
+./run_tests.sh
+```
+
+**Alternative manual testing:**
+```bash
+cd code
+source ../venv/bin/activate
 python -m unittest discover tests -v
 ```
 
@@ -477,12 +489,13 @@ source activate_env.sh
 
 ## 🤝 **Contributing**
 
-1. Use the virtual environment: `source activate_env.sh`
-2. Run tests before submitting: `./verify_setup.sh`
-3. Follow unified architecture patterns in `code/unified/`
-4. Add tests for new features in `code/tests/`
-5. Update documentation for new features
-6. Ensure Git LFS files are properly tracked
+1. Use the virtual environment: `cd code && source activate_env.sh`
+2. Run tests before submitting: `cd code && ./run_tests.sh`
+3. Verify setup: `./verify_setup.sh`
+4. Follow unified architecture patterns in `code/unified/`
+5. Add tests for new features in `code/tests/`
+6. Update documentation for new features
+7. Ensure Git LFS files are properly tracked
 
 ## 📄 **License & Citation**
 
