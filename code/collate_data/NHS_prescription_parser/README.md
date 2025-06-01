@@ -36,7 +36,7 @@ source activate_env.sh
 
 - **Single command interface** for all prescription analysis types
 - **Automatic format detection** for old (2014-2021) and new (2021+) data formats
-- **Extended date range support** from 201401 to 202112
+- **Extended date range support** from 201401 to 202503
 - **Multi-year LSOA mapping** with automatic year detection
 - **Git LFS integration** for 47 mapping files (35MB-29MB large files)
 - **Comprehensive bootstrap system** with automatic file management
@@ -72,16 +72,13 @@ Calculate prescription prevalence for specific drug names.
 
 ```bash
 cd code
-python unified_prevalence.py drug \
-  -d metformin ibuprofen aspirin \
-  -s 202001 -e 202012
+python drug_prevalence.py -d metformin ibuprofen aspirin -s 202001 -e 202012
 ```
 
 **Options:**
 - `-d, --drugs` - List of drug names (space-separated)
 - `-s, --start` - Start date (YYYYMM format)
 - `-e, --end` - End date (YYYYMM format)  
-- `-y, --year` - Year for LSOA mapping (optional, auto-detected)
 - `-odir, --output_dir` - Custom output directory (optional)
 
 ### 2. **Custom List Analysis**
@@ -89,9 +86,7 @@ python unified_prevalence.py drug \
 Using predefined JSON files containing drug names and BNF codes:
 
 ```bash
-python unified_prevalence.py custom \
-  -l sample_list_antidepressants.json \
-  -s 202001 -e 202012
+python custom_list_prevalence.py -l sample_list_antidepressants.json -s 202001 -e 202012
 ```
 
 **JSON Format:**
@@ -107,49 +102,27 @@ python unified_prevalence.py custom \
 Using DrugBank disease-drug mappings:
 
 ```bash
-python unified_prevalence.py condition \
-  -c diabetes hypertension depression \
-  -s 202001 -e 202012
+python condition_prevalence.py -c depression anxiety -s 202001 -e 202012
 ```
 
 **With custom drug lists:**
 ```bash
-python unified_prevalence.py condition \
-  -c depression anxiety \
-  -s 202001 -e 202012 \
-  --custom_drug_list sample_list_antidepressants.json
+python condition_prevalence.py -c depression anxiety -s 202001 -e 202012 --custom_drug_list_file_names sample_list_antidepressants.json
 ```
-
-### 4. **Extended Format Support (2021+ Data)**
-
-For newer NHS data formats with 2021 LSOA boundaries:
-
-```bash
-python run_extended.py drug \
-  -d metformin \
-  -s 202110 -e 202110 \
-  -y 2021
-```
-
-**Available commands:**
-- `drug` - Drug prevalence with 2021+ mappings
-- `list` - Custom list analysis with new format
-- `condition` - Condition analysis with updated boundaries
-- `opioid` - Specialized opioid OME calculations
 
 ## 🗂️ **Large File Management (Git LFS)**
 
 This repository uses Git LFS to manage 47 large mapping files:
 
-**Large Files Tracked (>25MB):**
+### **Large Files Tracked (>25MB):**
 - `GP_LSOA_weights_2013.csv` (35MB)
 - `GP_LSOA_PATIENTSDIST_2021.json` (29MB)
 - `GP_LSOA_PATIENTSDIST.json` (26MB)
 
-**All Mapping Files (21 total):**
+### **All Mapping Files (21 total):**
 - Drug association graphs, GP registries, LSOA mappings, chemical master maps
 
-**Setting up LFS:**
+### **Setting up LFS:**
 ```bash
 # Install Git LFS (if not installed)
 brew install git-lfs          # macOS
@@ -160,7 +133,29 @@ git lfs install
 git lfs pull
 ```
 
-The bootstrap script handles this automatically and provides guidance if LFS is missing.
+### **If LFS Files Are Missing:**
+
+Check if files are LFS pointers vs actual data:
+```bash
+# This should show CSV headers, NOT "version https://git-lfs.github.com/spec/v1"
+head -3 code/mappings/CHEM_MASTER_MAP.csv
+
+# Check file sizes - should be MB, not just a few KB
+ls -lh code/mappings/ | head -5
+```
+
+**Solution 1: Use Dedicated LFS Downloader (Recommended)**
+```bash
+./download_lfs_files.sh
+```
+
+**Solution 2: Manual LFS Commands**
+```bash
+git lfs install
+git lfs fetch --all
+git lfs pull
+git lfs checkout
+```
 
 ## 📁 **Output Structure**
 
@@ -209,7 +204,7 @@ jupyter notebook extract_yearly_prevalence.ipynb
 
 ### Supported Date Ranges
 - **Historical data (old format)**: 201401 to 202102
-- **Current data (new format)**: 202101 to 202112
+- **Current data (new format)**: 202101 to 202503
 - **Overlap period**: 202101-202102 (both formats available)
 
 ### LSOA Boundaries
@@ -235,18 +230,39 @@ print(f'Available sources: {len(downloader.sources)}')
 "
 ```
 
+## 🔧 **System Requirements**
+
+- **Python**: 3.8 or higher
+- **Operating System**: macOS, Linux, or Windows (with bash)
+- **Memory**: 4GB+ RAM recommended
+- **Storage**: 2GB+ free space
+- **Internet**: Required for initial setup and data downloads
+
+## 📚 **Core Dependencies**
+
+- `pandas` - Data processing
+- `numpy` - Numerical operations  
+- `tqdm` - Progress bars
+- `networkx` - Drug relationship graphs
+- `requests` - Data downloading
+- `matplotlib` - Plotting
+- `seaborn` - Statistical visualizations
+- `scipy` - Statistical tests
+
 ## 🔧 **Troubleshooting**
 
-### Missing Files After Bootstrap
+### Common Issues
+
+**1. Missing Files After Bootstrap**
 ```bash
 # Download essential files manually
-./download_files.sh
+./download_lfs_files.sh
 
 # Or generate sample data for testing
 python code/claude_experiments/download_essential_files.py --sample
 ```
 
-### Git LFS Issues
+**2. Git LFS Issues**
 ```bash
 # Check LFS status
 git lfs ls-files | wc -l  # Should show 47 files
@@ -256,10 +272,39 @@ git lfs install
 git lfs pull
 ```
 
-### Common Issues
-- **Module Import Errors**: Ensure you're in `code/` directory with environment activated
-- **Date Range Errors**: Use YYYYMM format, check dates are in 201401-202112 range
-- **Missing Dependencies**: Run `pip install -r requirements.txt`
+**3. Python/Environment Issues**
+```bash
+# Check version
+python3 --version
+
+# Remove and recreate environment
+rm -rf venv
+./bootstrap.sh
+```
+
+**4. Permission denied on scripts**
+```bash
+chmod +x bootstrap.sh activate_env.sh run_analysis.sh verify_setup.sh
+```
+
+### Getting Help
+
+**Script-specific help:**
+```bash
+./run_analysis.sh --help
+python code/drug_prevalence.py --help
+```
+
+**File availability check:**
+```bash
+source activate_env.sh
+python code/claude_experiments/handle_missing_files.py
+```
+
+**Full system verification:**
+```bash
+./verify_setup.sh
+```
 
 ## 🎯 **Example Workflows**
 
@@ -269,7 +314,7 @@ git lfs pull
 ./run_analysis.sh condition diabetes 2020
 
 # 2. Or advanced usage
-python unified_prevalence.py condition -c diabetes -s 202001 -e 202012 --verbose
+python code/condition_prevalence.py -c diabetes -s 202001 -e 202012
 
 # 3. Post-process
 jupyter notebook extract_yearly_prevalence.ipynb
@@ -289,58 +334,155 @@ print(df.groupby('YYYYMM')['Total_quantity'].sum())
 "
 ```
 
-### Extended Format Analysis (2021+ Data)
+### Testing Your Setup
 ```bash
-# Process new data files first
-python process_new_data.py \
-  --gp-registry data_prep/gp-reg-pat-prac-lsoa-all_2021.csv \
-  --years 2021 \
-  --lsoa-mapping data_prep/LSOA_DEC_2021.csv \
-  --epd-file data_prep/EPD_202110.ZIP
+# 1. Verify environment
+./verify_setup.sh
 
-# Run analysis with 2021 boundaries
+# 2. Test analysis (small dataset)
+./run_analysis.sh drug metformin 2019-01
+
+# 3. Check output
+ls data_prep/metformin_V4.csv.gz
+```
+
+## 📝 **Success Indicators**
+
+You'll know the setup worked when:
+- ✅ `./verify_setup.sh` passes all checks
+- ✅ `./run_analysis.sh drug metformin 2021` completes successfully  
+- ✅ Files appear in `data_prep/` directory
+- ✅ No error messages during bootstrap
+- ✅ Mapping files show actual data (CSV headers, JSON content)
+- ✅ Large files show correct sizes (35MB, 29MB, etc.)
+
+## 🔒 **Data Security & Privacy**
+
+- **No patient-level data**: All analysis uses aggregate statistics
+- **LSOA-level only**: Geographic data at population level (1,500 people avg)
+- **NHS compliance**: Follows NHS Digital data usage guidelines
+- **Local processing**: All computation happens on your machine
+
+## 🔧 **Extended Features (2021+ Data)**
+
+For newer NHS data formats with 2021 LSOA boundaries, use the extended interface:
+
+```bash
+cd code
 python run_extended.py drug -d metformin -s 202110 -e 202110 -y 2021
 ```
 
-## 📚 **Legacy Compatibility**
+**Available extended commands:**
+- `drug` - Drug prevalence with 2021+ mappings
+- `list` - Custom list analysis with new format
+- `condition` - Condition analysis with updated boundaries
+- `opioid` - Specialized opioid OME calculations
 
-Original scripts remain available:
-- `drug_prevalence.py`
-- `custom_list_prevalence.py`  
-- `condition_prevalence.py`
+## 📊 **Testing & Validation Framework**
 
-However, the unified interface is recommended for better error handling and automatic format detection.
+The system includes comprehensive testing for data quality assurance:
 
-## 📖 **Additional Resources**
+### Statistical Validation
+```bash
+cd code/claude_experiments
+python statistical_validation_analysis.py
+```
 
-- **Detailed Implementation**: `COMPREHENSIVE_TESTING_REPORT.md`
-- **Architecture Details**: `code/unified/unified_processor.py`
-- **Research Paper**: `NeurIPS-2023-medsat-a-public-health-dataset-for-england.pdf`
-- **Manual Processing**: `MANUAL_PROCESSING_GUIDE.md`
-- **Bootstrap Details**: `GETTING_STARTED.md`
+**Provides:**
+- Correlation tests (Pearson and Spearman)
+- Normality assessment (Shapiro-Wilk, Q-Q plots)
+- Effect size calculations (Cohen's d)
+- Multiple testing corrections
+
+### Unit Tests
+```bash
+cd code
+python -m unittest discover tests -v
+```
+
+**Test Coverage:**
+- ✅ Download system (both .gz and .ZIP formats)
+- ✅ Format detection (old/new data formats)
+- ✅ Data processing pipeline
+- ✅ LSOA mapping (multi-year support)
+- ✅ Integration tests (end-to-end workflows)
+
+## 🎯 **Research Applications**
+
+### London Prescription Analysis
+```bash
+cd code/claude_experiments
+python london_correlation_analysis.py
+```
+
+**Generates:**
+- Correlation analysis between time periods
+- Geographic trend visualizations
+- Statistical significance testing
+- COVID-19 impact assessment
+
+### System Analysis
+```bash
+cd code/analysis
+python system_analysis.py
+```
+
+**Provides:**
+- Code quality assessment
+- Performance optimization recommendations
+- Architecture analysis
+
+## 📚 **Documentation Structure**
+
+### Core Files
+- `README.md` (this file) - Complete system documentation
+- `CLAUDE.md` - Claude Code integration instructions
+- `config.json` - System configuration
+
+### Legacy Files (Still Valid)
+- Original analysis scripts: `drug_prevalence.py`, `custom_list_prevalence.py`, `condition_prevalence.py`
+- Processing guides: Manual processing instructions available if needed
+- Testing reports: Comprehensive improvement documentation
+
+## 🏗️ **Architecture Overview**
+
+### Unified System (`code/unified/`)
+- **DataFrameAdapter**: Automatic format detection and field mapping
+- **LSPOAMappingManager**: Multi-year LSOA boundary support
+- **MetricsCalculator**: Format-agnostic prevalence calculations
+- **UnifiedProcessor**: Single entry point for all operations
+
+### Key Benefits
+- **100% backward compatibility** with existing workflows
+- **Automatic format detection** eliminates manual configuration
+- **Centralized configuration** reduces scattered settings
+- **Comprehensive testing** ensures reliability
 
 ## 💡 **Quick Help**
 
 ```bash
 # General help
 ./run_analysis.sh --help
-python unified_prevalence.py --help
+python code/drug_prevalence.py --help
 
-# Command-specific help
-python unified_prevalence.py drug --help
-python unified_prevalence.py condition --help
+# Extended functionality help
+python code/run_extended.py --help
 
 # Check setup
 ./verify_setup.sh
+
+# Activate environment
+source activate_env.sh
 ```
 
 ## 🤝 **Contributing**
 
 1. Use the virtual environment: `source activate_env.sh`
 2. Run tests before submitting: `./verify_setup.sh`
-3. Follow unified architecture patterns
-4. Update documentation for new features
-5. Ensure Git LFS files are properly tracked
+3. Follow unified architecture patterns in `code/unified/`
+4. Add tests for new features in `code/tests/`
+5. Update documentation for new features
+6. Ensure Git LFS files are properly tracked
 
 ## 📄 **License & Citation**
 

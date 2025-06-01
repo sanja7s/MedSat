@@ -27,11 +27,13 @@ class TestDownloader(unittest.TestCase):
         self.download_dir = os.path.join(self.temp_dir, 'downloads')
         os.makedirs(self.download_dir, exist_ok=True)
         
-        # Create test sources file
+        # Create test sources file including 2024 data
         test_sources = {
             "202001.gz": "https://example.com/202001.gz",
             "202002.gz": "https://example.com/202002.gz",
-            "202103.ZIP": "https://example.com/EPD_202103.ZIP"
+            "202103.ZIP": "https://example.com/EPD_202103.ZIP",
+            "202401.ZIP": "https://example.com/EPD_202401.ZIP",
+            "202412.ZIP": "https://example.com/EPD_202412.ZIP"
         }
         with open(self.sources_file, 'w') as f:
             json.dump(test_sources, f)
@@ -44,11 +46,13 @@ class TestDownloader(unittest.TestCase):
         """Test downloader initialization."""
         downloader = Downloader(self.sources_file, self.download_dir)
         
-        self.assertEqual(len(downloader.sources), 3)
-        self.assertEqual(len(downloader.year_source), 3)
+        self.assertEqual(len(downloader.sources), 5)
+        self.assertEqual(len(downloader.year_source), 5)
         self.assertIn("202001", downloader.year_source)
         self.assertIn("202002", downloader.year_source)
         self.assertIn("202103", downloader.year_source)
+        self.assertIn("202401", downloader.year_source)
+        self.assertIn("202412", downloader.year_source)
     
     def test_date_format_validation(self):
         """Test date format validation."""
@@ -74,16 +78,24 @@ class TestDownloader(unittest.TestCase):
         # Single month
         dates = downloader.generate_dates("202001", "202001")
         self.assertEqual(dates, ["202001"])
+        
+        # Test 2024 date range
+        dates = downloader.generate_dates("202401", "202403")
+        expected = ["202401", "202402", "202403"]
+        self.assertEqual(dates, expected)
     
     def test_takestock(self):
         """Test file caching functionality."""
-        # Create some test files
+        # Create some test files including 2024 data
         gz_file = os.path.join(self.download_dir, "202001.gz")
-        zip_file = os.path.join(self.download_dir, "202103.ZIP")
+        zip_file_2021 = os.path.join(self.download_dir, "202103.ZIP")
+        zip_file_2024 = os.path.join(self.download_dir, "202401.ZIP")
         
         with open(gz_file, 'w') as f:
             f.write("test")
-        with open(zip_file, 'w') as f:
+        with open(zip_file_2021, 'w') as f:
+            f.write("test")
+        with open(zip_file_2024, 'w') as f:
             f.write("test")
         
         downloader = Downloader(self.sources_file, self.download_dir)
@@ -91,6 +103,7 @@ class TestDownloader(unittest.TestCase):
         
         self.assertIn("202001", downloader.cache)
         self.assertIn("202103", downloader.cache)
+        self.assertIn("202401", downloader.cache)
     
     def test_extract_and_process_zip(self):
         """Test ZIP file extraction and processing."""
@@ -114,6 +127,33 @@ class TestDownloader(unittest.TestCase):
         with gzip.open(result, 'rt') as f:
             content = f.read()
             self.assertEqual(content, test_csv_content)
+    
+    def test_extract_and_process_zip_2024(self):
+        """Test ZIP file extraction for 2024 data format."""
+        downloader = Downloader(self.sources_file, self.download_dir)
+        
+        # Create a test ZIP file with 2024 format CSV content (new format)
+        test_csv_content = "PRACTICE_CODE,ITEMS,ACTUAL_COST,TOTAL_QUANTITY,BNF_CODE\nP001,10,15.50,100,BNF001\nP002,20,25.75,200,BNF002\n"
+        zip_path = os.path.join(self.download_dir, "test_202401.ZIP")
+        
+        with zipfile.ZipFile(zip_path, 'w') as zipf:
+            zipf.writestr("EPD_202401.csv", test_csv_content)
+        
+        # Test extraction
+        result = downloader.extract_and_process_zip(zip_path, "202401")
+        
+        self.assertIsNotNone(result)
+        self.assertTrue(result.endswith("202401.gz"))
+        self.assertTrue(os.path.exists(result))
+        
+        # Verify content maintains new format structure
+        with gzip.open(result, 'rt') as f:
+            content = f.read()
+            self.assertEqual(content, test_csv_content)
+            # Verify new format headers are present
+            self.assertIn("PRACTICE_CODE", content)
+            self.assertIn("ACTUAL_COST", content)
+            self.assertIn("TOTAL_QUANTITY", content)
     
     @patch('sources.downloader.requests.get')
     def test_download_file(self, mock_get):
@@ -146,13 +186,16 @@ class TestDownloaderIntegration(unittest.TestCase):
         self.download_dir = os.path.join(self.temp_dir, 'downloads')
         os.makedirs(self.download_dir, exist_ok=True)
         
-        # Create comprehensive test sources
+        # Create comprehensive test sources including 2024 data
         test_sources = {
             "202001.gz": "https://example.com/202001.gz",
             "202002.gz": "https://example.com/202002.gz", 
             "202101.gz": "https://example.com/202101.gz",
             "202101.ZIP": "https://example.com/EPD_202101.ZIP",
-            "202102.ZIP": "https://example.com/EPD_202102.ZIP"
+            "202102.ZIP": "https://example.com/EPD_202102.ZIP",
+            "202401.ZIP": "https://example.com/EPD_202401.ZIP",
+            "202406.ZIP": "https://example.com/EPD_202406.ZIP",
+            "202412.ZIP": "https://example.com/EPD_202412.ZIP"
         }
         with open(self.sources_file, 'w') as f:
             json.dump(test_sources, f)
@@ -179,6 +222,22 @@ class TestDownloaderIntegration(unittest.TestCase):
         # Out of range dates
         with self.assertRaises(ValueError):
             downloader.download_range("199901", "199902")
+    
+    def test_2024_data_availability(self):
+        """Test that 2024 data sources are available."""
+        downloader = Downloader(self.sources_file, self.download_dir)
+        
+        # Check that 2024 dates are recognized
+        self.assertIn("202401", downloader.year_source)
+        self.assertIn("202406", downloader.year_source)
+        self.assertIn("202412", downloader.year_source)
+        
+        # Test 2024 date range generation
+        dates = downloader.generate_dates("202401", "202403")
+        self.assertEqual(len(dates), 3)
+        self.assertIn("202401", dates)
+        self.assertIn("202402", dates)
+        self.assertIn("202403", dates)
 
 
 if __name__ == '__main__':
