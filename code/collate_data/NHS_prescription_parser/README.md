@@ -23,13 +23,16 @@ The bootstrap script will:
 
 ```bash
 # Activate environment
-source activate_env.sh
+cd code && source activate_env.sh
 
 # Verify everything works
 ./verify_setup.sh
 
 # Start analyzing
 ./run_analysis.sh drug metformin 2021
+
+# Or for multi-year precise control
+./run_analysis.sh condition asthma 201801:202409
 ```
 
 ## 🆕 **What's New in the Unified Version**
@@ -65,6 +68,9 @@ The bootstrap creates an easy-to-use analysis runner:
 
 # Multi-year analysis
 ./run_analysis.sh drug metformin 2018:2021  # 2018-2021, all months
+
+# Precise month control (exact start/end)
+./run_analysis.sh condition asthma 201801:202409  # Jan 2018 - Sep 2024
 ```
 
 ## 📋 **Advanced Usage**
@@ -520,5 +526,22 @@ source activate_env.sh
 This code is part of the MedSat research project. If you use this code in your research, please cite the MedSat paper.
 
 ---
+
+### **🚀 Quick Command Reference**
+
+```bash
+# Setup
+./bootstrap.sh
+cd code && source activate_env.sh
+
+# Basic analysis
+./run_analysis.sh drug metformin 2021
+
+# Multi-year with exact month control
+./run_analysis.sh condition depression 201801:202409
+
+# Extended features (2021+ data)
+python run_extended.py condition -c asthma -s 201801 -e 202409 -y 2021
+```
 
 **🎉 Ready to use? Run `./bootstrap.sh` and start analyzing!**

@@ -13,18 +13,19 @@ show_help() {
     echo "🏥 NHS Prescription Parser - Analysis Runner"
     echo "============================================="
     echo ""
-    echo "📋 USAGE: $0 <analysis_type> <target> <year> [options]"
+    echo "📋 USAGE: $0 <analysis_type> <target> <date_range> [options]"
     echo ""
     echo "🔍 ANALYSIS TYPES:"
     echo "  drug        Analyze specific drug prevalence by name"
     echo "  condition   Analyze condition-based prevalence (uses DrugBank mapping)"
     echo "  custom      Use custom drug list from JSON file with BNF codes"
     echo ""
-    echo "📅 YEAR FORMATS (Choose what works best for your research):"
+    echo "📅 DATE FORMATS (Choose what works best for your research):"
     echo "  2021        Full year analysis (Jan-Dec 2021) - Most common"
     echo "  2021-01     Single month (Jan 2021) - Quick testing"
     echo "  2021-01:06  Month range within year (Jan-Jun 2021) - Seasonal analysis"
     echo "  2018:2024   Multi-year range (2018-2024, all months) - Longitudinal studies"
+    echo "  201801:202409  Exact month range (Jan 2018 - Sep 2024) - Precise control"
     echo ""
     echo "✨ COMMON EXAMPLES:"
     echo ""
@@ -46,6 +47,9 @@ show_help() {
     echo ""
     echo "  📈 Longitudinal studies (multi-year):"
     echo "    $0 condition diabetes 2018:2024"
+    echo ""
+    echo "  🎯 Precise date control (exact months):"
+    echo "    $0 condition asthma 201801:202409"
     echo ""
     echo "⚙️ OPTIONS:"
     echo "  --output DIR    Custom output directory (default: ../data_prep/)"
@@ -89,7 +93,7 @@ TARGET=$2
 YEAR=$3
 shift 3
 
-# Parse year format
+# Parse date format
 if [[ $YEAR =~ ^([0-9]{4})$ ]]; then
     # Full year: 2021 -> 202101 to 202112
     START_DATE="${YEAR}01"
@@ -106,19 +110,25 @@ elif [[ $YEAR =~ ^([0-9]{4}):([0-9]{4})$ ]]; then
     # Multi-year range: 2018:2024 -> 201801 to 202412
     START_DATE="${BASH_REMATCH[1]}01"
     END_DATE="${BASH_REMATCH[2]}12"
+elif [[ $YEAR =~ ^([0-9]{6}):([0-9]{6})$ ]]; then
+    # Exact month range: 201801:202409 -> 201801 to 202409
+    START_DATE="${BASH_REMATCH[1]}"
+    END_DATE="${BASH_REMATCH[2]}"
 else
-    echo "❌ Invalid year format: '$YEAR'"
+    echo "❌ Invalid date format: '$YEAR'"
     echo ""
     echo "📅 Valid formats:"
     echo "  YYYY        Full year (e.g., 2021)"
     echo "  YYYY-MM     Single month (e.g., 2021-01)"
     echo "  YYYY-MM:MM  Month range (e.g., 2021-01:06)"
     echo "  YYYY:YYYY   Multi-year (e.g., 2018:2024)"
+    echo "  YYYYMM:YYYYMM  Exact months (e.g., 201801:202409)"
     echo ""
     echo "💡 Examples:"
     echo "  $0 drug metformin 2021"
     echo "  $0 condition asthma 2021-01"
     echo "  $0 condition depression 2018:2022"
+    echo "  $0 condition asthma 201801:202409"
     echo ""
     exit 1
 fi
