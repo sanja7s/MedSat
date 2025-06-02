@@ -15,7 +15,7 @@ import os
 from tqdm import tqdm
 from sources.downloader import Downloader
 from matching.drugMatching import DrugMatcher
-from matching.commonFunc_updated import (
+from matching.commonFunc import (
     calculateTemporalMetrics_LSOA,
     writeResultFiles,
     calculateTemporalMetrics_LSOA_opioids,

@@ -14,7 +14,7 @@ import argparse
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from matching.commonFunc import str2bool
-from matching.commonFunc_updated import detect_file_format, prepare_dataframe
+from matching.commonFunc import detect_file_format, prepare_dataframe
 
 
 class TestDataFormatDetection(unittest.TestCase):

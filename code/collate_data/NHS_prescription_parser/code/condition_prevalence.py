@@ -5,12 +5,14 @@ import glob
 import pandas as pd
 from matching.commonFunc import str2bool
 from matching.commonFunc import writeResultFiles, calculateTemporalMetrics_LSOA
-from matching.commonFunc_updated import detect_file_format
+from matching.commonFunc import detect_file_format
+from matching.parallel_handler import try_parallel_processing, handle_info_request
 from matching.drugMatching import DrugMatcher
 from sources.downloader import Downloader
 from tqdm import tqdm
 import os
 import json
+import sys
 
 
 if __name__ == '__main__':
@@ -21,10 +23,20 @@ if __name__ == '__main__':
     parser.add_argument('-s', "--start" , help="start year and month, format YYYYMM")
     parser.add_argument('-e', "--end" , help="end year and month, format YYYYMM")
     parser.add_argument('-odir', "--output_dir" , help="Directory for output files, default ../data_prep/")
+    
+    # Parallel processing arguments (backward compatible)
+    parser.add_argument('--cores', type=int, default=None, help='Number of CPU cores to use (default: auto)')
+    parser.add_argument('--serial', action='store_true', help='Force serial processing')
+    parser.add_argument('--benchmark', action='store_true', help='Run benchmark comparing serial vs parallel')
+    parser.add_argument('--info', action='store_true', help='Show system resources and processing recommendations')
 
     input_dir = "./prescriptionfiles/"
     output_dir = "../data_prep/"
     args = parser.parse_args()
+    
+    # Handle info request
+    if handle_info_request(args):
+        sys.exit(0)
 
     conditions = args.conditions
     print("Running for : ", conditions)
@@ -58,6 +70,12 @@ if __name__ == '__main__':
         for f in files_sub:
             print(f)
 
+        # Try parallel processing
+        if try_parallel_processing('condition', args, files_sub,
+                                  conditions=conditions,
+                                  mappings_dir='./mappings/',
+                                  output_dir=output_dir):
+            sys.exit(0)
     
         matcher = DrugMatcher(mappings_dir = './mappings/' , output_dir=output_dir)
 
