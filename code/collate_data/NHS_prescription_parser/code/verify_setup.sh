@@ -5,7 +5,7 @@ echo "🔍 NHS Prescription Parser Setup Verification"
 echo "============================================="
 
 # Activate environment
-source ./venv/bin/activate
+source ../venv/bin/activate
 
 echo "✅ Virtual environment activated"
 
@@ -34,12 +34,15 @@ else:
 # Check directory structure
 echo ""
 echo "📁 Checking directory structure..."
-dirs=("code" "code/prescriptionfiles" "data_prep" "code/mappings")
-for dir in "${dirs[@]}"; do
+dirs=("." "prescriptionfiles" "../data_prep" "mappings")
+dir_names=("code" "code/prescriptionfiles" "data_prep" "code/mappings")
+for i in "${!dirs[@]}"; do
+    dir="${dirs[$i]}"
+    display_name="${dir_names[$i]}"
     if [ -d "$dir" ]; then
-        echo "  ✅ $dir"
+        echo "  ✅ $display_name"
     else
-        echo "  ❌ $dir (missing)"
+        echo "  ❌ $display_name (missing)"
     fi
 done
 
@@ -47,6 +50,14 @@ done
 echo ""
 echo "📄 Checking core files..."
 files=(
+    "drug_prevalence.py"
+    "condition_prevalence.py" 
+    "custom_list_prevalence.py"
+    "mappings/GPs.json"
+    "mappings/drug_association_graph.gexf"
+)
+
+file_names=(
     "code/drug_prevalence.py"
     "code/condition_prevalence.py" 
     "code/custom_list_prevalence.py"
@@ -54,18 +65,20 @@ files=(
     "code/mappings/drug_association_graph.gexf"
 )
 
-for file in "${files[@]}"; do
+for i in "${!files[@]}"; do
+    file="${files[$i]}"
+    display_name="${file_names[$i]}"
     if [ -f "$file" ]; then
-        echo "  ✅ $file"
+        echo "  ✅ $display_name"
     else
-        echo "  ❌ $file (missing)"
+        echo "  ❌ $display_name (missing)"
     fi
 done
 
 # Test import
 echo ""
 echo "🧪 Testing core functionality..."
-cd code
+# We're already in the code directory
 python3 -c "
 import sys
 sys.path.append('.')
