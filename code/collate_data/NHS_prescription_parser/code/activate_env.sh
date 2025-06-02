@@ -1,7 +1,7 @@
 #!/bin/bash
 # Activate NHS Prescription Parser environment
 echo "🏥 Activating NHS Prescription Parser environment..."
-source ../venv/bin/activate
+source ./venv/bin/activate
 echo "✅ Environment activated! Use 'deactivate' to exit."
 echo ""
 echo "Quick start commands:"

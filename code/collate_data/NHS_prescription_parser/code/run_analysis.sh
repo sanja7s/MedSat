@@ -4,177 +4,67 @@
 set -e
 
 # Activate environment
-source ../venv/bin/activate
+source ./venv/bin/activate
 
-# We're already in code directory, no need to cd
+# Change to code directory
+cd code
 
 # Function to show help
 show_help() {
-    echo "🏥 NHS Prescription Parser - Analysis Runner"
-    echo "============================================="
+    echo "NHS Prescription Parser - Analysis Runner"
+    echo "========================================"
     echo ""
-    echo "📋 USAGE: $0 <analysis_type> <target> <date_range> [options]"
+    echo "Usage: $0 <analysis_type> <target> <year> [options]"
     echo ""
-    echo "🔍 ANALYSIS TYPES:"
-    echo "  drug        Analyze specific drug prevalence by name"
-    echo "  condition   Analyze condition-based prevalence (uses DrugBank mapping)"
-    echo "  custom      Use custom drug list from JSON file with BNF codes"
+    echo "Analysis Types:"
+    echo "  drug        Analyze specific drug prevalence"
+    echo "  condition   Analyze condition-based prevalence"
+    echo "  custom      Use custom drug list from JSON file"
     echo ""
-    echo "📅 DATE FORMATS (Choose what works best for your research):"
-    echo "  2021        Full year analysis (Jan-Dec 2021) - Most common"
-    echo "  2021-01     Single month (Jan 2021) - Quick testing"
-    echo "  2021-01:06  Month range within year (Jan-Jun 2021) - Seasonal analysis"
-    echo "  2019-09 2021-01  Separate start/end dates (Sep 2019 - Jan 2021) - Flexible ranges"
-    echo "  2018:2024   Multi-year range (2018-2024, all months) - Longitudinal studies"
-    echo "  201801:202409  Exact month range (Jan 2018 - Sep 2024) - Precise control"
+    echo "Examples:"
+    echo "  $0 drug metformin 2021"
+    echo "  $0 drug \"metformin ibuprofen\" 2021"
+    echo "  $0 condition depression 2021"
+    echo "  $0 custom sample_list_antidepressants.json 2021"
     echo ""
-    echo "✨ COMMON EXAMPLES:"
+    echo "Year formats:"
+    echo "  2021        Analyze full year (Jan-Dec 2021)"
+    echo "  2021-01     Single month (Jan 2021)"
+    echo "  2021-01:06  Date range (Jan-Jun 2021)"
     echo ""
-    echo "  📊 Quick drug analysis (single year):"
-    echo "    $0 drug metformin 2021"
+    echo "Options:"
+    echo "  --output DIR    Output directory (default: ../data_prep/)"
+    echo "  --help         Show this help"
     echo ""
-    echo "  🔬 Multiple drugs (space-separated, quoted):"
-    echo "    $0 drug \"metformin insulin aspirin\" 2021"
-    echo ""
-    echo "  🏥 Medical condition analysis:"
-    echo "    $0 condition depression 2021"
-    echo "    $0 condition asthma 2018:2022"
-    echo ""
-    echo "  📋 Custom drug lists (with BNF codes):"
-    echo "    $0 custom sample_list_antidepressants.json 2021"
-    echo ""
-    echo "  ⏱️ Quick testing (single month):"
-    echo "    $0 drug metformin 2021-01"
-    echo ""
-    echo "  📈 Longitudinal studies (multi-year):"
-    echo "    $0 condition diabetes 2018:2024"
-    echo ""
-    echo "  🎯 Precise date control (exact months):"
-    echo "    $0 condition asthma 201801:202409"
-    echo ""
-    echo "  📅 Cross-year analysis (separate start/end dates):"
-    echo "    $0 condition asthma 2019-09 2021-01"
-    echo ""
-    echo "⚙️ OPTIONS:"
-    echo "  --output DIR    Custom output directory (default: ../data_prep/)"
-    echo "  --cores N       Number of CPU cores to use (default: all available)"
-    echo "  --parallel      Enable parallel processing (default: auto)"
-    echo "  --serial        Force serial processing (disable parallelization)"
-    echo "  --benchmark     Run benchmark to compare serial vs parallel performance"
-    echo "  --info          Show system resources and processing recommendations"
-    echo "  --help         Show this comprehensive help"
-    echo ""
-    echo "⏰ PERFORMANCE GUIDE:"
-    echo "  Single month:   ~30-60 seconds"
-    echo "  Full year:      ~10-20 minutes (12 months)"
-    echo "  Multi-year:     ~30-60 minutes (depends on range)"
-    echo ""
-    echo "📁 OUTPUT:"
-    echo "  Results saved to: ../data_prep/<drug/condition>_V4.csv.gz"
-    echo "  Format: LSOA-level prevalence data with patient counts"
-    echo ""
-    echo "🚀 QUICK START:"
-    echo "  1. Test with single month:  $0 drug metformin 2021-01"
-    echo "  2. Run full analysis:       $0 condition asthma 2021"
-    echo "  3. Check results:           ls ../data_prep/"
-    echo ""
-    echo "🔧 ADVANCED USAGE (Direct Python scripts with more options):"
+    echo "Direct script usage (more options):"
     echo "  python drug_prevalence.py --help"
     echo "  python condition_prevalence.py --help"
     echo "  python custom_list_prevalence.py --help"
-    echo ""
-    echo "❓ NEED HELP?"
-    echo "  • For 2021+ data with extended features: python run_extended.py --help"
-    echo "  • System verification: ./verify_setup.sh"
-    echo "  • Test suite: ./run_tests.sh"
-    echo ""
-    echo "💡 TIP: Start with single month analysis to verify your setup works!"
 }
 
-# Check for special flags first
-if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    show_help
-    exit 0
-fi
-
-if [ "$1" = "--info" ]; then
-    echo "🖥️ System Information"
-    echo "===================="
-    python -c "
-from matching.parallel_integration import print_processing_info
-print_processing_info()
-"
-    exit 0
-fi
-
 # Check arguments
-if [ $# -lt 3 ]; then
+if [ $# -lt 3 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     show_help
     exit 0
 fi
 
 ANALYSIS_TYPE=$1
 TARGET=$2
-YEAR_OR_START=$3
 
-# Check if the 4th argument looks like a date (for separate start/end dates)
+# Check if 4th argument is a date (space-separated format support)
 if [ $# -ge 4 ] && [[ "$4" =~ ^[0-9]{4}(-[0-9]{2})?$ ]]; then
-    # User provided separate start and end dates: condition asthma 2019-09 2021-01
+    # Space-separated format: script condition asthma 2020-01 2021-01
     START_DATE_ARG=$3
     END_DATE_ARG=$4
     YEAR="$START_DATE_ARG:$END_DATE_ARG"
     shift 4
 else
-    # User provided single date format: condition asthma 2019-09:2021-01
+    # Standard format: script condition asthma 2020-01:2021-01
     YEAR=$3
     shift 3
 fi
 
-# Parse additional options
-CORES=""
-PARALLEL_MODE="auto"
-BENCHMARK_MODE=false
-SHOW_INFO=false
-OUTPUT_DIR=""
-
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --cores)
-            CORES="$2"
-            shift 2
-            ;;
-        --parallel)
-            PARALLEL_MODE="enabled"
-            shift
-            ;;
-        --serial)
-            PARALLEL_MODE="disabled"
-            shift
-            ;;
-        --benchmark)
-            BENCHMARK_MODE=true
-            shift
-            ;;
-        --info)
-            SHOW_INFO=true
-            shift
-            ;;
-        --output)
-            OUTPUT_DIR="$2"
-            shift 2
-            ;;
-        --help|-h)
-            show_help
-            exit 0
-            ;;
-        *)
-            echo "Unknown option: $1"
-            exit 1
-            ;;
-    esac
-done
-
-# Parse date format
+# Parse year format
 if [[ $YEAR =~ ^([0-9]{4})$ ]]; then
     # Full year: 2021 -> 202101 to 202112
     START_DATE="${YEAR}01"
@@ -188,164 +78,43 @@ elif [[ $YEAR =~ ^([0-9]{4})-([0-9]{2}):([0-9]{2})$ ]]; then
     START_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
     END_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
 elif [[ $YEAR =~ ^([0-9]{4})-([0-9]{2}):([0-9]{4})-([0-9]{2})$ ]]; then
-    # Cross-year month range: 2019-09:2021-01 -> 201909 to 202101
+    # Cross-year range: 2020-01:2021-01 -> 202001 to 202101
     START_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
     END_DATE="${BASH_REMATCH[3]}${BASH_REMATCH[4]}"
-elif [[ $YEAR =~ ^([0-9]{4}):([0-9]{4})$ ]]; then
-    # Multi-year range: 2018:2024 -> 201801 to 202412
-    START_DATE="${BASH_REMATCH[1]}01"
-    END_DATE="${BASH_REMATCH[2]}12"
-elif [[ $YEAR =~ ^([0-9]{6}):([0-9]{6})$ ]]; then
-    # Exact month range: 201801:202409 -> 201801 to 202409
-    START_DATE="${BASH_REMATCH[1]}"
-    END_DATE="${BASH_REMATCH[2]}"
 else
-    echo "❌ Invalid date format: '$YEAR'"
-    echo ""
-    echo "📅 Valid formats:"
-    echo "  YYYY        Full year (e.g., 2021)"
-    echo "  YYYY-MM     Single month (e.g., 2021-01)"
-    echo "  YYYY-MM:MM  Month range (e.g., 2021-01:06)"
-    echo "  YYYY-MM YYYY-MM  Separate start/end dates (e.g., 2019-09 2021-01)"
-    echo "  YYYY:YYYY   Multi-year (e.g., 2018:2024)"
-    echo "  YYYYMM:YYYYMM  Exact months (e.g., 201801:202409)"
-    echo ""
-    echo "💡 Examples:"
-    echo "  $0 drug metformin 2021"
-    echo "  $0 condition asthma 2021-01"
-    echo "  $0 condition depression 2018:2022"
-    echo "  $0 condition asthma 2019-09 2021-01"
-    echo "  $0 condition asthma 201801:202409"
-    echo ""
+    echo "❌ Invalid year format: $YEAR"
+    echo "Use: YYYY, YYYY-MM, YYYY-MM:MM, or YYYY-MM:YYYY-MM"
     exit 1
-fi
-
-# Show system info if requested (from additional flags)
-if [ "$SHOW_INFO" = true ]; then
-    echo "🖥️ System Information" 
-    echo "===================="
-    python -c "
-from matching.parallel_integration import print_processing_info
-print_processing_info()
-"
-    exit 0
 fi
 
 echo "🏥 NHS Prescription Parser Analysis"
 echo "==================================="
 echo "Type: $ANALYSIS_TYPE"
-echo "Target: $TARGET" 
+echo "Target: $TARGET"
 echo "Period: $START_DATE to $END_DATE"
-
-# Show parallel processing configuration
-if [ "$PARALLEL_MODE" = "disabled" ]; then
-    echo "Processing: Serial (1 core)"
-else
-    if [ -n "$CORES" ]; then
-        echo "Processing: Parallel ($CORES cores)"
-    else
-        echo "Processing: Parallel (auto-detect cores)"
-    fi
-fi
 echo ""
 
 # Run appropriate analysis
 case $ANALYSIS_TYPE in
     "drug")
         echo "🔍 Running drug prevalence analysis..."
-        
-        # Build Python command with parallel options
-        PYTHON_CMD="python drug_prevalence.py -d $TARGET -s $START_DATE -e $END_DATE"
-        
-        # Add parallel processing options
-        if [ "$PARALLEL_MODE" = "disabled" ]; then
-            PYTHON_CMD="$PYTHON_CMD --serial"
-        elif [ -n "$CORES" ]; then
-            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
-        fi
-        
-        if [ "$BENCHMARK_MODE" = true ]; then
-            PYTHON_CMD="$PYTHON_CMD --benchmark"
-        fi
-        
-        if [ -n "$OUTPUT_DIR" ]; then
-            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
-        fi
-        
-        eval $PYTHON_CMD
+        python drug_prevalence.py -d $TARGET -s $START_DATE -e $END_DATE "$@"
         ;;
     "condition")
         echo "🔍 Running condition prevalence analysis..."
-        
-        # Build Python command with parallel options
-        PYTHON_CMD="python condition_prevalence.py -c $TARGET -s $START_DATE -e $END_DATE"
-        
-        # Add parallel processing options
-        if [ "$PARALLEL_MODE" = "disabled" ]; then
-            PYTHON_CMD="$PYTHON_CMD --serial"
-        elif [ -n "$CORES" ]; then
-            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
-        fi
-        
-        if [ "$BENCHMARK_MODE" = true ]; then
-            PYTHON_CMD="$PYTHON_CMD --benchmark"
-        fi
-        
-        if [ -n "$OUTPUT_DIR" ]; then
-            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
-        fi
-        
-        eval $PYTHON_CMD
+        python condition_prevalence.py -c $TARGET -s $START_DATE -e $END_DATE "$@"
         ;;
     "custom")
         echo "🔍 Running custom list prevalence analysis..."
         if [ ! -f "$TARGET" ]; then
-            echo "❌ Custom list file not found: '$TARGET'"
-            echo ""
-            echo "📋 Available sample files:"
-            ls -1 sample_list_*.json 2>/dev/null | head -5 || echo "  No sample_list_*.json files found"
-            echo ""
-            echo "💡 Create your own JSON file with format:"
-            echo '  {"drug_name": ["BNF_code1", "BNF_code2"]}'
-            echo ""
-            echo "📖 Example: sample_list_antidepressants.json"
+            echo "❌ Custom list file not found: $TARGET"
             exit 1
         fi
-        
-        # Build Python command with parallel options
-        PYTHON_CMD="python custom_list_prevalence.py -l $TARGET -s $START_DATE -e $END_DATE"
-        
-        # Add parallel processing options
-        if [ "$PARALLEL_MODE" = "disabled" ]; then
-            PYTHON_CMD="$PYTHON_CMD --serial"
-        elif [ -n "$CORES" ]; then
-            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
-        fi
-        
-        if [ "$BENCHMARK_MODE" = true ]; then
-            PYTHON_CMD="$PYTHON_CMD --benchmark"
-        fi
-        
-        if [ -n "$OUTPUT_DIR" ]; then
-            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
-        fi
-        
-        eval $PYTHON_CMD
+        python custom_list_prevalence.py -l $TARGET -s $START_DATE -e $END_DATE "$@"
         ;;
     *)
-        echo "❌ Unknown analysis type: '$ANALYSIS_TYPE'"
-        echo ""
-        echo "🔍 Valid analysis types:"
-        echo "  drug        Analyze specific drug prevalence"
-        echo "  condition   Analyze medical condition prevalence"
-        echo "  custom      Use custom JSON drug list"
-        echo ""
-        echo "💡 Examples:"
-        echo "  $0 drug metformin 2021"
-        echo "  $0 condition depression 2021"
-        echo "  $0 custom sample_list_antidepressants.json 2021"
-        echo ""
-        echo "❓ For full help: $0 --help"
+        echo "❌ Unknown analysis type: $ANALYSIS_TYPE"
+        echo "Use: drug, condition, or custom"
         exit 1
         ;;
 esac

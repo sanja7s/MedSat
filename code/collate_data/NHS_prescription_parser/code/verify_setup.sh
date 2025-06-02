@@ -5,7 +5,7 @@ echo "🔍 NHS Prescription Parser Setup Verification"
 echo "============================================="
 
 # Activate environment
-source ../venv/bin/activate
+source ./venv/bin/activate
 
 echo "✅ Virtual environment activated"
 
@@ -34,7 +34,7 @@ else:
 # Check directory structure
 echo ""
 echo "📁 Checking directory structure..."
-dirs=("." "./prescriptionfiles" "../data_prep" "./mappings")
+dirs=("code" "code/prescriptionfiles" "data_prep" "code/mappings")
 for dir in "${dirs[@]}"; do
     if [ -d "$dir" ]; then
         echo "  ✅ $dir"
@@ -47,11 +47,11 @@ done
 echo ""
 echo "📄 Checking core files..."
 files=(
-    "./drug_prevalence.py"
-    "./condition_prevalence.py" 
-    "./custom_list_prevalence.py"
-    "./mappings/GPs.json"
-    "./mappings/drug_association_graph.gexf"
+    "code/drug_prevalence.py"
+    "code/condition_prevalence.py" 
+    "code/custom_list_prevalence.py"
+    "code/mappings/GPs.json"
+    "code/mappings/drug_association_graph.gexf"
 )
 
 for file in "${files[@]}"; do
@@ -65,6 +65,7 @@ done
 # Test import
 echo ""
 echo "🧪 Testing core functionality..."
+cd code
 python3 -c "
 import sys
 sys.path.append('.')

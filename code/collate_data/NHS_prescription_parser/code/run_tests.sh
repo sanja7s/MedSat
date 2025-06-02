@@ -54,6 +54,13 @@ echo ""
 echo "🏃 Running test suite..."
 echo "========================"
 
+echo "📋 Test Categories:"
+echo "   • Data Processing Tests (test_data_processing.py)"
+echo "   • Download System Tests (test_downloader.py)"
+echo "   • Unified System Tests (test_unified_system.py)"
+echo "   • End-to-End Interface Tests (test_run_analysis_e2e.py)"
+echo ""
+
 python -m unittest discover tests -v
 
 test_result=$?

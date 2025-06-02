@@ -31,8 +31,8 @@ cd code && source activate_env.sh
 # Start analyzing
 ./run_analysis.sh drug metformin 2021
 
-# Or for multi-year precise control
-./run_analysis.sh condition asthma 201801:202409
+# Cross-year analysis (colon-separated format)
+./run_analysis.sh condition asthma 2019-09:2021-01
 ```
 
 ## 🆕 **What's New in the Unified Version**
@@ -48,6 +48,19 @@ cd code && source activate_env.sh
 - **Comprehensive bootstrap system** with automatic file management
 - **Improved error handling** and comprehensive logging
 - **Unified architecture** eliminating code duplication
+
+## 📅 **Standardized Date Format**
+
+All analysis commands use a **colon-separated date syntax** for consistency:
+
+| Format | Description | Example | Output |
+|--------|-------------|---------|---------|
+| `YYYY` | Full year | `2021` | Jan-Dec 2021 |
+| `YYYY-MM` | Single month | `2021-01` | Jan 2021 only |
+| `YYYY-MM:MM` | Month range (same year) | `2021-01:06` | Jan-Jun 2021 |
+| `YYYY-MM:YYYY-MM` | Cross-year range | `2019-09:2021-01` | Sep 2019-Jan 2021 |
+| `YYYY:YYYY` | Multi-year | `2018:2024` | Full years 2018-2024 |
+| `YYYYMM:YYYYMM` | Exact months | `201801:202409` | Jan 2018-Sep 2024 |
 
 ## 📊 **Easy Mode Analysis (Recommended)**
 
@@ -66,14 +79,17 @@ The bootstrap creates an easy-to-use analysis runner with **parallel processing 
 # Use custom drug list
 ./run_analysis.sh custom code/sample_list_antidepressants.json 2021
 
-# Analyze specific months
+# Analyze specific months (same year)
 ./run_analysis.sh drug metformin 2021-01:06  # Jan-Jun 2021
 
-# Multi-year analysis
-./run_analysis.sh drug metformin 2018:2021  # 2018-2021, all months
+# Cross-year analysis
+./run_analysis.sh drug metformin 2019-09:2021-01  # Sep 2019-Jan 2021
+
+# Multi-year analysis (full years)
+./run_analysis.sh condition asthma 2018:2021  # 2018-2021, all months
 
 # Precise month control (exact start/end)
-./run_analysis.sh condition asthma 201801:202409  # Jan 2018 - Sep 2024
+./run_analysis.sh condition asthma 201801:202409  # Jan 2018-Sep 2024
 
 # Parallel processing (NEW - 5-10x faster for multi-year)
 ./run_analysis.sh condition asthma 201801:202409 --cores 8  # Use 8 CPU cores

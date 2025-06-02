@@ -40,17 +40,24 @@ fi
 print_status "Setting up NHS Prescription Parser environment..."
 
 # Detect Python version
-PYTHON_VERSION=$(python3 --version 2>/dev/null | cut -d' ' -f2 | cut -d'.' -f1-2 || echo "")
-if [ -z "$PYTHON_VERSION" ]; then
+PYTHON_FULL_VERSION=$(python3 --version 2>/dev/null | cut -d' ' -f2 || echo "")
+if [ -z "$PYTHON_FULL_VERSION" ]; then
     print_error "Python 3 not found. Please install Python 3.8 or higher."
     exit 1
 fi
 
+PYTHON_VERSION=$(echo $PYTHON_FULL_VERSION | cut -d'.' -f1-2)
 print_status "Found Python $PYTHON_VERSION"
 
 # Check if python version is sufficient (3.8+)
 PYTHON_MAJOR=$(echo $PYTHON_VERSION | cut -d'.' -f1)
 PYTHON_MINOR=$(echo $PYTHON_VERSION | cut -d'.' -f2)
+
+# Ensure we have valid integers
+if ! [[ "$PYTHON_MAJOR" =~ ^[0-9]+$ ]] || ! [[ "$PYTHON_MINOR" =~ ^[0-9]+$ ]]; then
+    print_error "Could not parse Python version: $PYTHON_FULL_VERSION"
+    exit 1
+fi
 
 if [ "$PYTHON_MAJOR" -lt 3 ] || ([ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 8 ]); then
     print_error "Python 3.8+ required. Found Python $PYTHON_VERSION"
@@ -61,7 +68,17 @@ fi
 VENV_DIR="venv"
 if [ ! -d "$VENV_DIR" ]; then
     print_status "Creating virtual environment..."
-    python3 -m venv $VENV_DIR
+    # Try to use system python3 if asdf is causing issues
+    if command -v /usr/bin/python3 >/dev/null 2>&1; then
+        PYTHON_CMD="/usr/bin/python3"
+    elif command -v /usr/local/bin/python3 >/dev/null 2>&1; then
+        PYTHON_CMD="/usr/local/bin/python3"
+    else
+        PYTHON_CMD="python3"
+    fi
+    
+    print_status "Using Python: $PYTHON_CMD"
+    $PYTHON_CMD -m venv $VENV_DIR
     print_success "Virtual environment created"
 else
     print_status "Virtual environment already exists"

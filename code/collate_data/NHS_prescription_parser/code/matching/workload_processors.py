@@ -10,7 +10,7 @@ import pandas as pd
 import time
 from typing import Dict, List, Tuple, Any
 from .parallel_engine import WorkloadProcessor, ProcessingResult
-from .commonFunc_updated import detect_file_format, calculateTemporalMetrics_LSOA
+from .commonFunc import detect_file_format, calculateTemporalMetrics_LSOA
 from .commonFunc import calculateTemporalMetrics_LSOA as calculateTemporalMetrics_LSOA_old
 
 
