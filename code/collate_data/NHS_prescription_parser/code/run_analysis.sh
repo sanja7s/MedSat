@@ -53,6 +53,11 @@ show_help() {
     echo ""
     echo "⚙️ OPTIONS:"
     echo "  --output DIR    Custom output directory (default: ../data_prep/)"
+    echo "  --cores N       Number of CPU cores to use (default: all available)"
+    echo "  --parallel      Enable parallel processing (default: auto)"
+    echo "  --serial        Force serial processing (disable parallelization)"
+    echo "  --benchmark     Run benchmark to compare serial vs parallel performance"
+    echo "  --info          Show system resources and processing recommendations"
     echo "  --help         Show this comprehensive help"
     echo ""
     echo "⏰ PERFORMANCE GUIDE:"
@@ -82,8 +87,24 @@ show_help() {
     echo "💡 TIP: Start with single month analysis to verify your setup works!"
 }
 
+# Check for special flags first
+if [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    show_help
+    exit 0
+fi
+
+if [ "$1" = "--info" ]; then
+    echo "🖥️ System Information"
+    echo "===================="
+    python -c "
+from matching.parallel_integration import print_processing_info
+print_processing_info()
+"
+    exit 0
+fi
+
 # Check arguments
-if [ $# -lt 3 ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+if [ $# -lt 3 ]; then
     show_help
     exit 0
 fi
@@ -92,6 +113,46 @@ ANALYSIS_TYPE=$1
 TARGET=$2
 YEAR=$3
 shift 3
+
+# Parse additional options
+CORES=""
+PARALLEL_MODE="auto"
+BENCHMARK_MODE=false
+SHOW_INFO=false
+OUTPUT_DIR=""
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --cores)
+            CORES="$2"
+            shift 2
+            ;;
+        --parallel)
+            PARALLEL_MODE="enabled"
+            shift
+            ;;
+        --serial)
+            PARALLEL_MODE="disabled"
+            shift
+            ;;
+        --benchmark)
+            BENCHMARK_MODE=true
+            shift
+            ;;
+        --info)
+            SHOW_INFO=true
+            shift
+            ;;
+        --output)
+            OUTPUT_DIR="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
 
 # Parse date format
 if [[ $YEAR =~ ^([0-9]{4})$ ]]; then
@@ -133,22 +194,82 @@ else
     exit 1
 fi
 
+# Show system info if requested (from additional flags)
+if [ "$SHOW_INFO" = true ]; then
+    echo "🖥️ System Information" 
+    echo "===================="
+    python -c "
+from matching.parallel_integration import print_processing_info
+print_processing_info()
+"
+    exit 0
+fi
+
 echo "🏥 NHS Prescription Parser Analysis"
 echo "==================================="
 echo "Type: $ANALYSIS_TYPE"
-echo "Target: $TARGET"
+echo "Target: $TARGET" 
 echo "Period: $START_DATE to $END_DATE"
+
+# Show parallel processing configuration
+if [ "$PARALLEL_MODE" = "disabled" ]; then
+    echo "Processing: Serial (1 core)"
+else
+    if [ -n "$CORES" ]; then
+        echo "Processing: Parallel ($CORES cores)"
+    else
+        echo "Processing: Parallel (auto-detect cores)"
+    fi
+fi
 echo ""
 
 # Run appropriate analysis
 case $ANALYSIS_TYPE in
     "drug")
         echo "🔍 Running drug prevalence analysis..."
-        python drug_prevalence.py -d $TARGET -s $START_DATE -e $END_DATE "$@"
+        
+        # Build Python command with parallel options
+        PYTHON_CMD="python drug_prevalence.py -d $TARGET -s $START_DATE -e $END_DATE"
+        
+        # Add parallel processing options
+        if [ "$PARALLEL_MODE" = "disabled" ]; then
+            PYTHON_CMD="$PYTHON_CMD --serial"
+        elif [ -n "$CORES" ]; then
+            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
+        fi
+        
+        if [ "$BENCHMARK_MODE" = true ]; then
+            PYTHON_CMD="$PYTHON_CMD --benchmark"
+        fi
+        
+        if [ -n "$OUTPUT_DIR" ]; then
+            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
+        fi
+        
+        eval $PYTHON_CMD
         ;;
     "condition")
         echo "🔍 Running condition prevalence analysis..."
-        python condition_prevalence.py -c $TARGET -s $START_DATE -e $END_DATE "$@"
+        
+        # Build Python command with parallel options
+        PYTHON_CMD="python condition_prevalence.py -c $TARGET -s $START_DATE -e $END_DATE"
+        
+        # Add parallel processing options
+        if [ "$PARALLEL_MODE" = "disabled" ]; then
+            PYTHON_CMD="$PYTHON_CMD --serial"
+        elif [ -n "$CORES" ]; then
+            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
+        fi
+        
+        if [ "$BENCHMARK_MODE" = true ]; then
+            PYTHON_CMD="$PYTHON_CMD --benchmark"
+        fi
+        
+        if [ -n "$OUTPUT_DIR" ]; then
+            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
+        fi
+        
+        eval $PYTHON_CMD
         ;;
     "custom")
         echo "🔍 Running custom list prevalence analysis..."
@@ -164,7 +285,26 @@ case $ANALYSIS_TYPE in
             echo "📖 Example: sample_list_antidepressants.json"
             exit 1
         fi
-        python custom_list_prevalence.py -l $TARGET -s $START_DATE -e $END_DATE "$@"
+        
+        # Build Python command with parallel options
+        PYTHON_CMD="python custom_list_prevalence.py -l $TARGET -s $START_DATE -e $END_DATE"
+        
+        # Add parallel processing options
+        if [ "$PARALLEL_MODE" = "disabled" ]; then
+            PYTHON_CMD="$PYTHON_CMD --serial"
+        elif [ -n "$CORES" ]; then
+            PYTHON_CMD="$PYTHON_CMD --cores $CORES"
+        fi
+        
+        if [ "$BENCHMARK_MODE" = true ]; then
+            PYTHON_CMD="$PYTHON_CMD --benchmark"
+        fi
+        
+        if [ -n "$OUTPUT_DIR" ]; then
+            PYTHON_CMD="$PYTHON_CMD --output_dir $OUTPUT_DIR"
+        fi
+        
+        eval $PYTHON_CMD
         ;;
     *)
         echo "❌ Unknown analysis type: '$ANALYSIS_TYPE'"
