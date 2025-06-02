@@ -24,6 +24,7 @@ show_help() {
     echo "  2021        Full year analysis (Jan-Dec 2021) - Most common"
     echo "  2021-01     Single month (Jan 2021) - Quick testing"
     echo "  2021-01:06  Month range within year (Jan-Jun 2021) - Seasonal analysis"
+    echo "  2019-09 2021-01  Separate start/end dates (Sep 2019 - Jan 2021) - Flexible ranges"
     echo "  2018:2024   Multi-year range (2018-2024, all months) - Longitudinal studies"
     echo "  201801:202409  Exact month range (Jan 2018 - Sep 2024) - Precise control"
     echo ""
@@ -50,6 +51,9 @@ show_help() {
     echo ""
     echo "  🎯 Precise date control (exact months):"
     echo "    $0 condition asthma 201801:202409"
+    echo ""
+    echo "  📅 Cross-year analysis (separate start/end dates):"
+    echo "    $0 condition asthma 2019-09 2021-01"
     echo ""
     echo "⚙️ OPTIONS:"
     echo "  --output DIR    Custom output directory (default: ../data_prep/)"
@@ -111,8 +115,20 @@ fi
 
 ANALYSIS_TYPE=$1
 TARGET=$2
-YEAR=$3
-shift 3
+YEAR_OR_START=$3
+
+# Check if the 4th argument looks like a date (for separate start/end dates)
+if [ $# -ge 4 ] && [[ "$4" =~ ^[0-9]{4}(-[0-9]{2})?$ ]]; then
+    # User provided separate start and end dates: condition asthma 2019-09 2021-01
+    START_DATE_ARG=$3
+    END_DATE_ARG=$4
+    YEAR="$START_DATE_ARG:$END_DATE_ARG"
+    shift 4
+else
+    # User provided single date format: condition asthma 2019-09:2021-01
+    YEAR=$3
+    shift 3
+fi
 
 # Parse additional options
 CORES=""
@@ -147,6 +163,10 @@ while [[ $# -gt 0 ]]; do
             OUTPUT_DIR="$2"
             shift 2
             ;;
+        --help|-h)
+            show_help
+            exit 0
+            ;;
         *)
             echo "Unknown option: $1"
             exit 1
@@ -167,6 +187,10 @@ elif [[ $YEAR =~ ^([0-9]{4})-([0-9]{2}):([0-9]{2})$ ]]; then
     # Date range: 2021-01:06 -> 202101 to 202106
     START_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
     END_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[3]}"
+elif [[ $YEAR =~ ^([0-9]{4})-([0-9]{2}):([0-9]{4})-([0-9]{2})$ ]]; then
+    # Cross-year month range: 2019-09:2021-01 -> 201909 to 202101
+    START_DATE="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+    END_DATE="${BASH_REMATCH[3]}${BASH_REMATCH[4]}"
 elif [[ $YEAR =~ ^([0-9]{4}):([0-9]{4})$ ]]; then
     # Multi-year range: 2018:2024 -> 201801 to 202412
     START_DATE="${BASH_REMATCH[1]}01"
@@ -182,6 +206,7 @@ else
     echo "  YYYY        Full year (e.g., 2021)"
     echo "  YYYY-MM     Single month (e.g., 2021-01)"
     echo "  YYYY-MM:MM  Month range (e.g., 2021-01:06)"
+    echo "  YYYY-MM YYYY-MM  Separate start/end dates (e.g., 2019-09 2021-01)"
     echo "  YYYY:YYYY   Multi-year (e.g., 2018:2024)"
     echo "  YYYYMM:YYYYMM  Exact months (e.g., 201801:202409)"
     echo ""
@@ -189,6 +214,7 @@ else
     echo "  $0 drug metformin 2021"
     echo "  $0 condition asthma 2021-01"
     echo "  $0 condition depression 2018:2022"
+    echo "  $0 condition asthma 2019-09 2021-01"
     echo "  $0 condition asthma 201801:202409"
     echo ""
     exit 1
