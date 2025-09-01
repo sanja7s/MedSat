@@ -1,0 +1,12 @@
+code/mappings/GP_LSOA_weights_2013.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/GP_LSOA_PATIENTSDIST_2021.json filter=lfs diff=lfs merge=lfs -text
+code/mappings/GP_LSOA_PATIENTSDIST.json filter=lfs diff=lfs merge=lfs -text
+code/mappings/* filter=lfs diff=lfs merge=lfs -text
+code/mappings/*.json filter=lfs diff=lfs merge=lfs -text
+code/mappings/*.csv filter=lfs diff=lfs merge=lfs -text
+code/mappings/*.pkl filter=lfs diff=lfs merge=lfs -text
+code/mappings/*.gexf filter=lfs diff=lfs merge=lfs -text
+*.json filter=lfs diff=lfs merge=lfs -text
+*.csv filter=lfs diff=lfs merge=lfs -text
+*.pkl filter=lfs diff=lfs merge=lfs -text
+*.gexf filter=lfs diff=lfs merge=lfs -text
